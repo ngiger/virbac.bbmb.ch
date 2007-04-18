@@ -3,8 +3,6 @@ body
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 12px;
 	background-color: #FFFFFF;
-	scrollbar-base-color: #00AA67;
-	scrollbar-arrow-color: #FFFFFF;
 }
 a, a:visited {
   color: blue;
@@ -140,6 +138,9 @@ form {
 }
 form#clear, form#transfer-dat, form#bcread {
   display: inline;
+}
+form#login {
+  border-top: 20px solid #039;
 }
 input[type=text], input[type=password] {
   width: 200px;
