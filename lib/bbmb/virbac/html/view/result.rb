@@ -28,7 +28,7 @@ class Products
     [7,1] =>  :price4,
     [8,1] =>  :price5,
     [9,1] =>  :price6,
-    [10,0]=>  :mwst,
+    [10,0]=>  :vat,
   }
   CSS_HEAD_MAP = {
     [5,0] => 'right',
@@ -44,9 +44,6 @@ class Products
   SYMBOL_MAP = {
     :expiry_date => HtmlGrid::DateValue, 
   }
-  def mwst(model)
-    @lookandfeel.lookup('mwst_%i' % model.mwst)
-  end
 end
 class Result
   include HtmlGrid::DojoToolkit::DojoTemplate

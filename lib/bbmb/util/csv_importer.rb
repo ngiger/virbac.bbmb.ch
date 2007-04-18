@@ -124,6 +124,10 @@ module BBMB
       end
     end
     class ProductImporter < CsvImporter
+      VAT = {
+        '1' => 2.4,
+        '2' => 7.6,
+      }
       PRODUCT_MAP = {
         1   =>  :status,
         2   =>  :description,
@@ -137,7 +141,7 @@ module BBMB
         10  =>  :l3_price, # Staffelpreise, Preis 3
         11  =>  :l4_qty  , # Staffelpreise, Stück 4
         12  =>  :l4_price, # Staffelpreise, Preis 4
-        13  =>  :mwst,
+        13  =>  :vat,
         14  =>  :ean13,
         15  =>  :catalogue1,
         16  =>  :catalogue2,
@@ -153,6 +157,8 @@ module BBMB
           case name
           when :expiry_date
             value = date(value)
+          when :vat
+            value = VAT[value]
           when :status
             value = (value == 'A') ? :active : :inactive
           end

@@ -25,6 +25,7 @@ class CurrentPositions
     [7,1]  =>  :price3,
     [8,1]  =>  :price4,
     [9,0]  =>  :total,
+    [10,0] =>  :vat,
   }
   CSS_MAP = {
     [0,0]     => 'delete',
@@ -32,12 +33,14 @@ class CurrentPositions
     [3,0]     => 'description',
     [6,0,3,2] => 'right',
     [9,0]     => 'total',
+    [10,0]    => 'right',
   }
   CSS_HEAD_MAP = {
     [1,0]  => 'right',
     [6,0]  => 'right',
     [7,0]  => 'right',
     [9,0]  => 'right',
+    [10,0] => 'right',
   }
 end
 class CurrentOrder

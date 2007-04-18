@@ -20,21 +20,23 @@ class Positions
     [4,1]  =>  :price3,
     [5,1]  =>  :price4,
     [6,0]  =>  :total,
+    [7,0]  =>  :vat,
   }
   CSS_MAP = {
     [0,0]     => 'tiny right',
     [1,0]     => 'description',
     [3,0,3,2] => 'right',
     [6,0]     => 'total',
+    [7,0]     => 'right',
   }
   CSS_HEAD_MAP = {
     [0,0] => 'right',
     [3,0] => 'right',
     [4,0] => 'right',
     [6,0] => 'right',
+    [7,0] => 'right',
   }
 end
     end
   end
 end
-
