@@ -120,6 +120,29 @@ div#order-total label {
 div#pager {
   padding: 4px;
 }
+div.tab {
+  background-color: #AAF;
+  padding: 4px;
+  border-bottom: 2px solid #039;
+}
+div.tab a {
+  padding: 2px 4px 2px 4px;
+  margin: 2px;
+  position: relative;
+  top: 2px;
+  background-color: #039;
+  color: white;
+  border-top: 1px solid #039;
+  border-left: 1px solid #039;
+  border-right: 1px solid #039;
+}
+div.tab a:link, div.tab a:visited {
+  background-color: #AAF;
+  color: #039;
+}
+div#title {
+  font-weight: bold;
+}
 div.toggler {
 	cursor: default;
 	border: 1px solid #BBB;

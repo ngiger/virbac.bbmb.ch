@@ -7,7 +7,9 @@ module BBMB
   module Html
     module Util
 class Validator
-  EVENTS.push(:catalogue, :promotions, :quotas)
+  BOOLEAN.push(:show_vat)
+  EVENTS.push(:calculate, :calculator, :catalogue, :promotions, :quotas)
+  NUMERIC.push(:factor)
   def category(value)
     value.split(',')
   end
