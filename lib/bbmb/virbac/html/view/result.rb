@@ -28,20 +28,25 @@ class Products
     [7,1] =>  :price4,
     [8,1] =>  :price5,
     [9,1] =>  :price6,
+    [10,0]=>  :mwst,
   }
   CSS_HEAD_MAP = {
     [5,0] => 'right',
     [6,0] => 'right',
     [7,0] => 'right',
+    [10,0]=> 'right',
   }
   CSS_MAP = { 
     [0,0]     => 'tiny', 
     [2,0]     => 'description',
-    [5,0,5,2] => 'right'
+    [5,0,6,2] => 'right'
   }
   SYMBOL_MAP = {
     :expiry_date => HtmlGrid::DateValue, 
   }
+  def mwst(model)
+    @lookandfeel.lookup('mwst_%i' % model.mwst)
+  end
 end
 class Result
   include HtmlGrid::DojoToolkit::DojoTemplate
