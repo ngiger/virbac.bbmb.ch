@@ -31,7 +31,7 @@ class CalculatorList < HtmlGrid::List
   SORT_DEFAULT = :description
   SORT_HEADER = false
   def init
-    @factor = @session.cookie_set_or_get(:factor).to_f || 1.5
+    @factor = (@session.cookie_set_or_get(:factor) || 1.5).to_f
     if(@vat = @session.cookie_set_or_get(:show_vat))
       components.update({
         [2,0] => :exclusive,

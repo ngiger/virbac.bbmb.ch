@@ -12,6 +12,7 @@ class Lookandfeel < SBSM::Lookandfeel
       :additional_info          =>  "Zusatzinformationen",
       :address1                 =>  "Adresse",
       :backorder                =>  "im Rückstand",
+      :backorder_date           =>  "im Rückstand bis %d.%m.%Y",
       :barcode_button           =>  "Barcode-Leser",
       :barcode_empty            =>  "Es sind keine Barcodes im Leser.",
       :barcode_none             =>  "Es konnte keine Verbindung zum Barcode-Leser hergestellt werden.",
@@ -86,6 +87,10 @@ class Lookandfeel < SBSM::Lookandfeel
       :nullify                  =>  "Alles auf 0 setzen",
       :order                    =>  "Archiv - Bestellung",
       :orders                   =>  "Archiv",
+      :order_problem            =>  <<-EOS,
+Beim Versand Ihrer Bestellung ist ein Problem aufgetreten.
+Ein Administrator wurde automatisch darüber informiert und wird mit Ihnen Kontakt aufnehmen.
+      EOS
       :order_product            =>  "Zu Bestellung hinzufügen",
       :order_sent               =>  "Ihre Bestellung wurde an die Virbac AG versandt.",
       :order_total              =>  "Total Sfr. ",
@@ -145,6 +150,7 @@ class Lookandfeel < SBSM::Lookandfeel
       :th_customer_id           =>  "Kundennr",
       :th_description           =>  "Artikelbezeichnung",
       :th_difference            =>  "Menge offen",
+      :th_end_date              =>  "Gültig bis",
       :th_email                 =>  "Email",
       :th_exclusive             =>  'exkl. MwSt.',
       :th_expiry_date           =>  'Verfalldatum',

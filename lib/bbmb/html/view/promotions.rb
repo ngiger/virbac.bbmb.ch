@@ -8,13 +8,18 @@ module BBMB
   module Html
     module View
 module PromotionMethods
+  def current_promo(model, key)
+    if((promo = model.send(key)) && promo.current?)
+      promo
+    end
+  end
   def end_date(model, key)
-    if(promo = model.send(key))
+    if(promo = current_promo(model, key))
       HtmlGrid::DateValue.new(:end_date, promo, @session, self)
     end
   end
   def lines(model, key)
-    if(promo = model.send(key))
+    if(promo = current_promo(model, key))
       lines = promo.lines.collect { |line|
         num = 1
         if(match = /(\d+)\s*x\s*\d/.match(line.to_s))
@@ -34,7 +39,7 @@ module PromotionMethods
     [_promotion(model, :promotion), _promotion(model, :sale)].compact
   end
   def _promotion(model, key)
-    if((promo = model.send(key)) && promo.current?)
+    if(promo = current_promo(model, key))
       link = HtmlGrid::Link.new(key, model, @session, self)
       link.css_class = key.to_s
       link.css_id = sprintf "%s-%s", key,  model.article_number

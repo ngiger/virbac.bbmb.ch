@@ -81,6 +81,68 @@ module BBMB
         customer
       end
     end
+    class ProductImporter < CsvImporter
+      VAT = {
+        '1' => 2.4,
+        '2' => 7.6,
+      }
+      PRODUCT_MAP = {
+        1   =>  :status,
+        2   =>  :description,
+       #3   =>  :l0_qty,   # Sollte immer 1 sein
+        4   =>  :price,    # Preis
+        5   =>  :l1_qty,   # Staffelpreise, Stück 1
+        6   =>  :l1_price, # Staffelpreise, Preis 1
+        7   =>  :l2_qty  , # Staffelpreise, Stück 2
+        8   =>  :l2_price, # Staffelpreise, Preis 2
+        9   =>  :l3_qty  , # Staffelpreise, Stück 3
+        10  =>  :l3_price, # Staffelpreise, Preis 3
+        11  =>  :l4_qty  , # Staffelpreise, Stück 4
+        12  =>  :l4_price, # Staffelpreise, Preis 4
+        13  =>  :vat,
+        14  =>  :ean13,
+        15  =>  :catalogue1,
+        16  =>  :catalogue2,
+        17  =>  :catalogue3,
+        18  =>  :expiry_date,
+        31  =>  :backorder,
+        32  =>  :backorder_date,
+      }
+      def import_record(record)
+        article_number = string(record[0])
+        product = Model::Product.find_by_article_number(article_number) \
+          || Model::Product.new(article_number)
+        PRODUCT_MAP.each { |idx, name|
+          value = string(record[idx])
+          case name
+          when :expiry_date, :backorder_date
+            value = date(value)
+          when :vat
+            value = VAT[value]
+          when :status
+            value = (value == 'A') ? :active : :inactive
+          end
+          product.send("#{name}=", value)
+        }
+        product.promotion = import_promotion(record, 19)
+        product.sale = import_promotion(record, 25)
+        product
+      end
+      def import_promotion(record, offset)
+        lines = []
+        4.times { |idx|
+          lines.push(string(record[offset + idx]))
+        }
+        lines.compact!
+        unless(lines.empty?)
+          promotion = Model::Promotion.new
+          promotion.lines.replace(lines)
+          promotion.start_date = date(record[offset + 4])
+          promotion.end_date = date(record[offset + 5])
+          promotion
+        end
+      end
+    end
     class QuotaImporter < CsvImporter
       QUOTA_MAP = {
         5  => :start_date, 
@@ -121,66 +183,6 @@ module BBMB
           active = @active_quotas[customer.customer_id] || []
           persistence.delete(customer.quotas - active)
         }
-      end
-    end
-    class ProductImporter < CsvImporter
-      VAT = {
-        '1' => 2.4,
-        '2' => 7.6,
-      }
-      PRODUCT_MAP = {
-        1   =>  :status,
-        2   =>  :description,
-       #3   =>  :l0_qty,   # Sollte immer 1 sein
-        4   =>  :price,    # Preis
-        5   =>  :l1_qty,   # Staffelpreise, Stück 1
-        6   =>  :l1_price, # Staffelpreise, Preis 1
-        7   =>  :l2_qty  , # Staffelpreise, Stück 2
-        8   =>  :l2_price, # Staffelpreise, Preis 2
-        9   =>  :l3_qty  , # Staffelpreise, Stück 3
-        10  =>  :l3_price, # Staffelpreise, Preis 3
-        11  =>  :l4_qty  , # Staffelpreise, Stück 4
-        12  =>  :l4_price, # Staffelpreise, Preis 4
-        13  =>  :vat,
-        14  =>  :ean13,
-        15  =>  :catalogue1,
-        16  =>  :catalogue2,
-        17  =>  :catalogue3,
-        18  =>  :expiry_date,
-      }
-      def import_record(record)
-        article_number = string(record[0])
-        product = Model::Product.find_by_article_number(article_number) \
-          || Model::Product.new(article_number)
-        PRODUCT_MAP.each { |idx, name|
-          value = string(record[idx])
-          case name
-          when :expiry_date
-            value = date(value)
-          when :vat
-            value = VAT[value]
-          when :status
-            value = (value == 'A') ? :active : :inactive
-          end
-          product.send("#{name}=", value)
-        }
-        product.promotion = import_promotion(record, 19)
-        product.sale = import_promotion(record, 25)
-        product
-      end
-      def import_promotion(record, offset)
-        lines = []
-        4.times { |idx|
-          lines.push(string(record[offset + idx]))
-        }
-        lines.compact!
-        unless(lines.empty?)
-          promotion = Model::Promotion.new
-          promotion.lines.replace(lines)
-          promotion.start_date = date(record[offset + 4])
-          promotion.end_date = date(record[offset + 5])
-          promotion
-        end
       end
     end
   end

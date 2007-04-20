@@ -3,6 +3,7 @@
 
 require 'bbmb/model/customer'
 require 'bbmb/model/product'
+require 'bbmb/model/promotion'
 
 class Object
   def meta_class; class << self; self; end; end
