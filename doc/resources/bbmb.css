@@ -58,6 +58,7 @@ div.dojoTooltip {
 }
 div#head img {
 	margin-bottom: 43px;
+	border: 0;
 }
 div.info {
   padding: 12px 4px;
