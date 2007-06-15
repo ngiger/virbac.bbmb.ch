@@ -13,7 +13,7 @@ class TestPromotions < Test::Unit::TestCase
   include Selenium::TestCase
   def test_quotas
     user = login_customer
-    assert_equal "BBMB | Home", @selenium.get_title
+    assert_equal "BBMB | Warenkorb (Home)", @selenium.get_title
 
     prod1 = Model::Product.new(12345)
     prod1.description = 'Product1'

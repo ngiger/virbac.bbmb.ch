@@ -36,7 +36,7 @@ class Lookandfeel < SBSM::Lookandfeel
       :contact                  =>  "Kontaktperson",
       :currency                 =>  "Sfr.",
       :currency_format          =>  "Sfr. %.2f",
-      :current_order            =>  "Home",
+      :current_order            =>  "Warenkorb (Home)",
       :customer                 =>  "Kunde",
       :customers                =>  "Kunden",
       :customer_id              =>  "Kundennr",
@@ -195,6 +195,7 @@ Ein Administrator wurde automatisch darüber informiert und wird mit Ihnen Konta
     :javascript => 'javascript',
     :logo       => 'logo.gif',
   }
+  DISABLED = [ :transfer_dat, :barcode_reader ]
   def navigation
     zone_navigation + super
   end

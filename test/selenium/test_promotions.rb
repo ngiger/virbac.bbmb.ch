@@ -12,7 +12,7 @@ class TestPromotions < Test::Unit::TestCase
   include Selenium::TestCase
   def test_promotions
     user = login_customer
-    assert_equal "BBMB | Home", @selenium.get_title
+    assert_equal "BBMB | Warenkorb (Home)", @selenium.get_title
 
     today = Date.today
     promo1 = Model::Promotion.new
@@ -69,7 +69,7 @@ class TestPromotions < Test::Unit::TestCase
     @persistence.should_receive(:save)
     click 'link=sale1 15 x 1 Packung'
     wait_for_page_to_load "30000"
-    assert_equal "BBMB | Home", @selenium.get_title
+    assert_equal "BBMB | Warenkorb (Home)", @selenium.get_title
     assert is_text_present('Product2')
     assert is_text_present('15')
     assert is_text_present('Aktuelle Bestellung: 1 Positionen')

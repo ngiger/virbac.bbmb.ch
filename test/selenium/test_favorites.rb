@@ -16,9 +16,8 @@ class TestFavorites < Test::Unit::TestCase
     assert_equal "BBMB | Schnellbestellung", @selenium.get_title
     assert @selenium.is_text_present("Aktuelle Schnellbest.: 0 Positionen")
     assert @selenium.is_element_present("//table[@id='favorites']")
-    assert @selenium.is_element_present("file_chooser")
-    assert @selenium.is_element_present("favorite_transfer")
-    assert_equal "Datei zu Schnellb.", @selenium.get_value("favorite_transfer")
+    assert !is_element_present("file_chooser")
+    assert !is_element_present("favorite_transfer")
     assert @selenium.is_element_present("query")
     assert @selenium.is_element_present("search_favorites")
     assert_equal "Suchen", @selenium.get_value("search_favorites")
@@ -46,8 +45,8 @@ class TestFavorites < Test::Unit::TestCase
     assert_equal "BBMB | Schnellbestellung", @selenium.get_title
     assert @selenium.is_text_present("Aktuelle Schnellbest.: 1 Positionen")
     assert !@selenium.is_text_present("im Rückstand")
-    assert @selenium.is_element_present("file_chooser")
-    assert @selenium.is_element_present("favorite_transfer")
+    assert !is_element_present("file_chooser")
+    assert !is_element_present("favorite_transfer")
     assert @selenium.is_element_present("clear_favorites")
     assert_equal "Schnellb. löschen", @selenium.get_value("clear_favorites")
     assert @selenium.is_text_present("2 Stk. à 12.50")
@@ -80,68 +79,6 @@ class TestFavorites < Test::Unit::TestCase
     assert_equal "BBMB | Schnellbestellung", @selenium.get_title
     assert @selenium.is_text_present("Aktuelle Schnellbest.: 0 Positionen")
   end
-  def test_favorites__transfer_dat
-    datadir = File.expand_path('data', File.dirname(__FILE__))
-    BBMB.persistence.should_ignore_missing
-    user = login_customer
-    @selenium.click "link=Schnellbestellung"
-    @selenium.wait_for_page_to_load "30000"
-    assert_equal "BBMB | Schnellbestellung", @selenium.get_title
-    assert @selenium.is_text_present("Aktuelle Schnellbest.: 0 Positionen")
-    assert @selenium.is_element_present("file_chooser")
-    assert @selenium.is_element_present("favorite_transfer")
-
-    src = <<-EOS
-030201899    0624427Mycolog creme tube 15 g                           000176803710902940030201899    1590386Risperdal cpr 20 1 mg                             000176805231601410030201899    0933022Tramal gtt 10 ml 100 mg/ml                        000276804378801970
-    EOS
-    path = File.join(datadir, 'Transfer.dat')
-    FileUtils.mkdir_p(datadir)
-    File.open(path, 'w') { |fh| fh.puts src }
-
-    prod1 = Model::Product.new('1')
-    prod1.description = 'product - by pcode'
-    prod1.price = Util::Money.new(11.50)
-    prod2 = Model::Product.new('2')
-    prod2.description = 'product - by ean13'
-    prod2.price = Util::Money.new(21.50)
-
-    prodclass = flexstub(Model::Product)
-    prodclass.should_receive(:find_by_pcode).and_return { |pcode|
-      if(pcode == '624427')
-         prod1
-      end
-    }
-    prodclass.should_receive(:find_by_ean13).and_return { |ean13|
-      if(ean13 == '7680523160141')
-         prod2
-      end
-    }
-
-    @selenium.type "file_chooser", path
-    @selenium.click "favorite_transfer"
-    @selenium.wait_for_page_to_load "30000"
-    assert_equal "BBMB | Schnellbestellung", @selenium.get_title
-
-    assert @selenium.is_text_present("Aktuelle Schnellbest.: 2 Positionen")
-    assert @selenium.is_text_present("product - by pcode")
-    assert @selenium.is_text_present("product - by ean13")
-    assert @selenium.is_text_present("Unidentifiziertes Produkt (Tramal gtt 10 ml 100 mg/ml, EAN-Code: 7680437880197, Pharmacode: 933022)")
-
-    @selenium.click "name=delete index=2"
-    @selenium.wait_for_page_to_load "30000"
-    assert_equal "BBMB | Schnellbestellung", @selenium.get_title
-    assert !@selenium.is_text_present("Unidentifiziertes Produkt (Tramal gtt 10 ml 100 mg/ml, EAN-Code: 7680437880197, Pharmacode: 933022)")
-    assert @selenium.is_text_present("Aktuelle Schnellbest.: 2 Positionen")
-
-    @selenium.click "name=delete index=1"
-    @selenium.wait_for_page_to_load "30000"
-    assert_equal "BBMB | Schnellbestellung", @selenium.get_title
-    assert @selenium.is_text_present("Aktuelle Schnellbest.: 1 Positionen")
-    assert @selenium.is_text_present("product - by ean13")
-    assert !@selenium.is_text_present("product - by pcode")
-  ensure
-    FileUtils.rm_r(datadir) if(File.exist?(datadir))
-  end
   def test_favorites__increment_order
     BBMB.persistence.should_ignore_missing
     customer = BBMB::Model::Customer.new('007')
@@ -162,7 +99,7 @@ class TestFavorites < Test::Unit::TestCase
     favs.add(5, product2)
     favs.add(7, product3)
     user = login_customer customer
-    assert_equal "BBMB | Home", @selenium.get_title
+    assert_equal "BBMB | Warenkorb (Home)", @selenium.get_title
     assert @selenium.is_text_present("Aktuelle Bestellung: 2 Positionen")
 
     @selenium.click "link=Schnellbestellung"
@@ -185,36 +122,6 @@ class TestFavorites < Test::Unit::TestCase
     assert_equal [['2', 5], ['3', 7]], favs.collect { |position|
       [position.article_number, position.quantity]
     }
-  end
-  def test_favorites__scan
-    BBMB.persistence.should_ignore_missing
-    user = login_customer
-    @selenium.click "link=Schnellbestellung"
-    @selenium.wait_for_page_to_load "30000"
-    assert_equal "BBMB | Schnellbestellung", @selenium.get_title
-    assert @selenium.is_text_present("Aktuelle Schnellbest.: 0 Positionen")
-
-    prod1 = Model::Product.new('1')
-    prod1.description = 'product 1'
-    prod1.price = Util::Money.new(11.50)
-    prodclass = flexstub(Model::Product)
-    prodclass.should_receive(:find_by_ean13).and_return { |ean13|
-      if(ean13 == '7680523160141')
-         prod1
-      end
-    }
-
-    ## simulate barcode-reader
-    @selenium.open('/de/scan/EAN_13[7680523160141]/1/EAN_13[7680123456781]/1')
-    @selenium.wait_for_page_to_load "30000"
-
-    @selenium.open('/de/favorites')
-    @selenium.wait_for_page_to_load "30000"
-    assert_equal "BBMB | Schnellbestellung", @selenium.get_title
-
-    assert @selenium.is_text_present("Aktuelle Schnellbest.: 1 Positionen")
-    assert @selenium.is_text_present("product 1")
-    assert @selenium.is_text_present("Unidentifiziertes Produkt (EAN-Code: 7680123456781)")
   end
   def test_favorites__backorder
     BBMB.persistence.should_ignore_missing
@@ -246,9 +153,9 @@ class TestFavorites < Test::Unit::TestCase
     @selenium.wait_for_page_to_load "30000"
     assert_equal "BBMB | Schnellbestellung", @selenium.get_title
     assert @selenium.is_text_present("Aktuelle Schnellbest.: 0 Positionen")
-    assert @selenium.is_element_present("//a[@name='barcode_usb']")
-    assert @selenium.is_element_present("//input[@name='barcode_button']")
-    assert @selenium.is_element_present("//input[@name='barcode_comport']")
+    assert !is_element_present("//a[@name='barcode_usb']")
+    assert !is_element_present("//input[@name='barcode_button']")
+    assert !is_element_present("//input[@name='barcode_comport']")
   end
 end
   end

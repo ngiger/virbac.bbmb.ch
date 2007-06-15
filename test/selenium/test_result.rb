@@ -65,7 +65,7 @@ class TestResult < Test::Unit::TestCase
     type "quantity[12345]", "15"
     click "document.products.order_product"
     wait_for_page_to_load "30000"
-    assert_equal "BBMB | Home", get_title
+    assert_equal "BBMB | Warenkorb (Home)", get_title
     assert is_element_present("link=product - a description")
     assert is_text_present("11.50")
     assert is_text_present("172.50")
@@ -169,7 +169,7 @@ class TestResult < Test::Unit::TestCase
     type "quantity[12345]", "10"
     click "document.products.order_product"
     wait_for_page_to_load "30000"
-    assert_equal "BBMB | Home", get_title
+    assert_equal "BBMB | Warenkorb (Home)", get_title
     assert_equal(10, @customer.current_order.quantity(product))
   end
   def test_result__promotion

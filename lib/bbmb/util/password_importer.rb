@@ -24,19 +24,14 @@ module BBMB
       def import_record(row)
         id = row.at(11).to_i
         password = string(row, 3)
-        if(!password.empty? \
-           && (customer = Model::Customer.find_by_customer_id(id)))
-          email = string(row, 10)
-          if(email != customer.email)
-            BBMB.logger.warn sprintf("customer-nr %8i  csv: %-32s  excel: %s",
-                                     id, customer.email, email)
-            nil
-          elsif(!email.empty?)
-            hash = Digest::MD5.hexdigest(password)
-            @session.grant(email, 'login', 
-                           BBMB.config.auth_domain + '.Customer')
-            @session.set_password(email, hash)
-          end
+        email = string(row, 10)
+        if(!password.empty? && !email.empty? \
+           && (customer = Model::Customer.find_by_customer_id(id)) \
+           && (email == customer.email))
+          hash = Digest::MD5.hexdigest(password)
+          @session.grant(email, 'login', 
+                         BBMB.config.auth_domain + '.Customer')
+          @session.set_password(email, hash)
         end
       end
       def postprocess(persistence)

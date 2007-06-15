@@ -12,7 +12,7 @@ class TestCalculator < Test::Unit::TestCase
   include Selenium::TestCase
   def test_calculator
     user = login_customer
-    assert_equal "BBMB | Home", @selenium.get_title
+    assert_equal "BBMB | Warenkorb (Home)", @selenium.get_title
 
     prod1 = BBMB::Model::Product.new(12345)
     prod1.catalogue1 = 'Kleintiere'

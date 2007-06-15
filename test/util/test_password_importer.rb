@@ -27,18 +27,24 @@ module BBMB
         @session = flexmock('yus_session')
         BBMB.auth.should_receive(:login).with('root', 'unguessable', 'ch.bbmb')\
           .times(1).and_return(@session)
+        BBMB.config = config = flexmock('config')
+        config.should_receive(:auth_domain).and_return('ch.bbmb')
+        config.should_ignore_missing
         @importer = PasswordImporter.new('root', 'unguessable')
         BBMB.logger = flexmock('logger')
       end
       def test_import_record__no_password
         @row[3] = nil
+        @row[10] = nil
         assert_nil @importer.import_record(@row)
       end
       def test_import_record__empty_password
         @password.should_receive(:to_s).with('utf8').times(1).and_return('')
+        @email.should_receive(:to_s).with('utf8').and_return('user@domain.tld')
         assert_nil @importer.import_record(@row)
       end
       def test_import_record__no_user
+        @email.should_receive(:to_s).with('utf8').and_return('user@domain.tld')
         @password.should_receive(:to_s).with('utf8').times(1).and_return('sekrit')
         @customer_class.should_receive(:find_by_customer_id).times(1)\
           .and_return(nil)
@@ -50,7 +56,6 @@ module BBMB
           .and_return(@customer)
         @customer.should_receive(:email).and_return(nil)
         @email.should_receive(:to_s).with('utf8').and_return('user@domain.tld')
-        BBMB.logger.should_receive(:warn).times(1)
         assert_nil @importer.import_record(@row)
       end
       def test_import_record__success

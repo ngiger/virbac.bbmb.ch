@@ -12,7 +12,7 @@ class TestCatalogue < Test::Unit::TestCase
   include Selenium::TestCase
   def test_catalogue
     user = login_customer
-    assert_equal "BBMB | Home", @selenium.get_title
+    assert_equal "BBMB | Warenkorb (Home)", @selenium.get_title
 
     prod1 = Model::Product.new(12345)
     prod1.catalogue1 = 'Kleintiere'
@@ -89,7 +89,7 @@ class TestCatalogue < Test::Unit::TestCase
     @persistence.should_receive(:save)
     click 'link=Product1'
     wait_for_page_to_load "30000"
-    assert_equal "BBMB | Home", @selenium.get_title
+    assert_equal "BBMB | Warenkorb (Home)", @selenium.get_title
     assert is_text_present('Product1')
     assert is_text_present('Aktuelle Bestellung: 1 Positionen')
   end
