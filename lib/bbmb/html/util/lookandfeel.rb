@@ -10,7 +10,7 @@ class Lookandfeel < SBSM::Lookandfeel
   DICTIONARIES = {
     "de"  =>  {
       :additional_info          =>  "Zusatzinformationen",
-      :address1                 =>  "Adresse",
+      :address1                 =>  "Strasse/Nr.",
       :backorder                =>  "im Rückstand",
       :backorder_date           =>  "im Rückstand bis %d.%m.%Y",
       :barcode_button           =>  "Barcode-Leser",
@@ -40,17 +40,19 @@ class Lookandfeel < SBSM::Lookandfeel
       :customer                 =>  "Kunde",
       :customers                =>  "Kunden",
       :customer_id              =>  "Kundennr",
+      :customer_or_tsv_id       =>  "TVS-Nr. oder Virbac Kunden-Nr.",
       :date_format              =>  "%d.%m.%Y",
       :delete                   =>  "Löschen",
       :default_values           =>  "Voreinstellungen",
       :drtitle                  =>  "Titel",
       :ean13                    =>  "EAN-Code",
-      :email                    =>  "Email",
+      :email                    =>  "E-Mail Adresse",
       :error                    =>  "Ihre Eingaben konnten nicht gespeichert werden da Angaben fehlen oder nicht korrekt sind.\nBitte ergänzen Sie die rot gekennzeichneten Felder.",
       :e_duplicate_email        =>  "Es gibt bereits ein Benutzerprofil für diese Email-Adresse",
       :e_email_required         =>  "Bitte speichern Sie zuerst eine gültige Email-Adresse",
       :e_empty_pass             =>  "Das Passwort war leer.",
       :e_invalid_ean13          =>  "Der EAN-Code war ungültig.",
+      :e_need_all_fields        =>  "Bitte füllen Sie alle Felder aus.",
       :e_non_matching_pass      =>  "Das Passwort und die Bestätigung waren nicht identisch.",
       :e_pass_not_set           =>  "Das Passwort konnte nicht gespeichert werden",
       :e_user_unsaved           =>  "Das Benutzerprofil wurde nicht gespeichert!",
@@ -83,6 +85,7 @@ class Lookandfeel < SBSM::Lookandfeel
       :new_customer             =>  "Neuer Kunde",
       :new_customer_mail        =>  "mailto:info@virbac.ch?subject=Neukunde BBMB - bitte Passwort generieren",
       :new_customer_invite      =>  "Bestellen Sie jetzt online. Wir richten für Sie den spezifisch auf Ihre Praxis zugeschnittenen, benutzerfreundlichen E-Shop ein!\nUnser Kundenservice oder unsere Aussendienstmitarbeiter beraten Sie gerne!",
+      :new_customer_thanks      =>  "Besten Dank für Ihre Anfrage.\nIhr Virbac-Team",
       :next                     =>  ">>",
       :nullify                  =>  "Alles auf 0 setzen",
       :order                    =>  "Archiv - Bestellung",
@@ -95,7 +98,7 @@ Ein Administrator wurde automatisch darüber informiert und wird mit Ihnen Konta
       :order_sent               =>  "Ihre Bestellung wurde an die Virbac AG versandt.",
       :order_total              =>  "Total Sfr. ",
       :order_transfer           =>  "Datei zu Best.",
-      :organisation             =>  "Kunde",
+      :organisation             =>  "Name Tierarztpraxis",
       :pass                     =>  "Passwort",
       :pager_index0             =>  " ",
       :pager_index1             =>  " bis ",
@@ -103,7 +106,7 @@ Ein Administrator wurde automatisch darüber informiert und wird mit Ihnen Konta
       :pager_total0             =>  " von ",
       :pager_total1             =>  "",
       :pcode                    =>  "Pharmacode",
-      :phone_business           =>  "Tel. Geschäft",
+      :phone_business           =>  "Tel. Praxis",
       :phone_mobile             =>  "Tel. Mobile",
       :phone_private            =>  "Tel. Privat",
       :plz                      =>  "PLZ",
@@ -135,6 +138,11 @@ Ein Administrator wurde automatisch darüber informiert und wird mit Ihnen Konta
       :promotions               =>  "Promotionen",
       :quotas                   =>  "Abschlüsse",
       :reference                =>  "Interne Bestellnummer",
+      :request_access           =>  "Anfrage Abschicken",
+      :request_sent             =>  <<-EOS,
+Ihre Anfrage wurde erfolgreich abgeschickt. Sie wird geprüft und innerhalb eines Werktags verarbeitet.
+Beste Grüsse. Virbac Schweiz AG
+      EOS
       :reset                    =>  "Zurücksetzen",
       :sale                     =>  "A",
       :sale_explain             =>  "<b>Aktion:</b>",
@@ -196,6 +204,7 @@ Ein Administrator wurde automatisch darüber informiert und wird mit Ihnen Konta
     :logo       => 'logo.gif',
   }
   DISABLED = [ :transfer_dat, :barcode_reader ]
+  ENABLED = [ :request_access ]
   def navigation
     zone_navigation + super
   end

@@ -24,7 +24,7 @@ class TestCustomer < Test::Unit::TestCase
     wait_for_page_to_load "30000"
     assert_equal "BBMB | Kunde", get_title
 
-    assert_equal "Kunde*", get_text("//label[@for='organisation']")
+    assert_equal "Name Tierarztpraxis*", get_text("//label[@for='organisation']")
     assert is_element_present("organisation")
     assert_equal "Test-Customer", get_value("organisation")
 
@@ -50,7 +50,7 @@ class TestCustomer < Test::Unit::TestCase
     assert is_element_present("lastname")
     assert_equal "Vorname", get_text("//label[@for='firstname']")
     assert is_element_present("firstname")
-    assert_equal "Adresse*", get_text("//label[@for='address1']")
+    assert_equal "Strasse/Nr.*", get_text("//label[@for='address1']")
     assert is_element_present("address1")
     assert is_element_present("address2")
     assert is_element_present("address3")
@@ -62,11 +62,11 @@ class TestCustomer < Test::Unit::TestCase
     assert_equal "Kanton", get_text("//label[@for='canton']")
     assert is_element_present("canton")
 
-    assert_equal "Email*", get_text("//label[@for='email']")
+    assert_equal "E-Mail Adresse*", get_text("//label[@for='email']")
     assert is_element_present("email")
     assert_equal "test.customer@bbmb.ch", get_value("email")
 
-    assert_equal "Tel. Geschäft", get_text("//label[@for='phone_business']")
+    assert_equal "Tel. Praxis", get_text("//label[@for='phone_business']")
     assert is_element_present("phone_business")
     assert_equal "Tel. Privat", get_text("//label[@for='phone_private']")
     assert is_element_present("phone_private")

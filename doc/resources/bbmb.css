@@ -109,6 +109,10 @@ div#navigation a:link, div#navigation a:visited {
 div#navigation a:hover {
   color: red;
 }
+div.new-customer {
+  cursor: pointer;
+  color: blue;
+}
 div#order-total, td.order-total {
   font-weight: bold;
   padding: 8px 4px 8px 8px;
@@ -189,6 +193,12 @@ table#favorites {
 }
 table.list {
   width: 100%
+}
+table#new-customer-form {
+  margin: 4px;
+  background-color: #CDF;
+  border: 1px solid #ABF;
+  width: auto;
 }
 td, th {
   padding: 4px
