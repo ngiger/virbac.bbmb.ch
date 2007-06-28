@@ -101,8 +101,9 @@ class TestLogin < Test::Unit::TestCase
     assert_equal "BBMB", get_title
     assert is_text_present "Neuer Kunde"
     assert_equal <<-EOS.strip,  get_text("//div[@class='new-customer']")
-Bestellen Sie jetzt online. Wir richten für Sie den spezifisch auf Ihre Praxis zugeschnittenen, benutzerfreundlichen E-Shop ein!
-Unser Kundenservice oder unsere Aussendienstmitarbeiter beraten Sie gerne!
+Bestellen Sie jetzt online. Wir richten für Sie den auf Ihre Praxis
+zugeschnittenen, benutzerfreundlichen E-Shop ein! Unsere Mitarbeiter im
+Kundendienst beraten Sie gerne!
     EOS
     assert is_element_present "new-customer"
     assert !is_visible("//div[@id='new-customer']")
@@ -153,8 +154,9 @@ Beste Grüsse. Virbac Schweiz AG
     wait_for_page_to_load "30000"
     assert_equal "BBMB", get_title
     assert_equal <<-EOS.strip,  get_text("//div[@class='new-customer']")
-Bestellen Sie jetzt online. Wir richten für Sie den spezifisch auf Ihre Praxis zugeschnittenen, benutzerfreundlichen E-Shop ein!
-Unser Kundenservice oder unsere Aussendienstmitarbeiter beraten Sie gerne!
+Bestellen Sie jetzt online. Wir richten für Sie den auf Ihre Praxis
+zugeschnittenen, benutzerfreundlichen E-Shop ein! Unsere Mitarbeiter im
+Kundendienst beraten Sie gerne!
     EOS
   end
 end

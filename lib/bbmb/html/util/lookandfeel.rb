@@ -85,7 +85,11 @@ class Lookandfeel < SBSM::Lookandfeel
       :logo                     =>  "Virbac",
       :new_customer             =>  "Neuer Kunde",
       :new_customer_mail        =>  "mailto:info@virbac.ch?subject=Neukunde BBMB - bitte Passwort generieren",
-      :new_customer_invite      =>  "Bestellen Sie jetzt online. Wir richten für Sie den spezifisch auf Ihre Praxis zugeschnittenen, benutzerfreundlichen E-Shop ein!\nUnser Kundenservice oder unsere Aussendienstmitarbeiter beraten Sie gerne!",
+      :new_customer_invite      =>  <<-EOS,
+Bestellen Sie jetzt online. Wir richten für Sie den auf Ihre Praxis
+zugeschnittenen, benutzerfreundlichen E-Shop ein! Unsere Mitarbeiter im
+Kundendienst beraten Sie gerne!
+      EOS
       :new_customer_thanks      =>  "Besten Dank für Ihre Anfrage.\nIhr Virbac-Team",
       :next                     =>  ">>",
       :nullify                  =>  "Alles auf 0 setzen",
