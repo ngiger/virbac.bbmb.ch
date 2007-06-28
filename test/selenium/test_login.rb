@@ -137,7 +137,8 @@ Tel. Praxis:    012 345 6789
 E-Mail Adresse: test@email.com
 TVS/Virbac-Nr:  890123
     EOS
-    mail.should_receive(:send_request).and_return { |org, body|
+    mail.should_receive(:send_request).and_return { |sender, org, body|
+      assert_equal 'test@email.com', sender
       assert_equal 'Organisation', org
       assert_equal expected, body
     }
