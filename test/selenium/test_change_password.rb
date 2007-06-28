@@ -32,7 +32,6 @@ class TestChangePassword < Test::Unit::TestCase
 
     BBMB.server = flexmock('server')
     BBMB.server.should_receive(:rename_user).times(1).and_return { |old, new|
-      puts "here we are all"
       raise Yus::YusError, 'duplicate email'
     }
     BBMB.server.should_ignore_missing
