@@ -75,6 +75,7 @@ div#info td {
 div.login-foot {
   font-weight: bold;
   cursor: pointer;
+  color: blue;
 }
 div#welcome {
   font-weight: bold;
