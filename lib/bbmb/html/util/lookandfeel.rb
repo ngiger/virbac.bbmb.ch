@@ -24,7 +24,6 @@ mitzuteilen.
 Preise
 Änderungen der Preise oder der Lieferbedingungen bleiben vorbehalten.
 
-
 Zahlung
 30 Tage netto. Je nach Wunsch geht die Verrechnung direkt an den
 Besteller oder über die Tierärztliche Verrechnungsstelle (TVS).
