@@ -130,13 +130,13 @@ class TestResult < Test::Unit::TestCase
     assert_equal 'product 1', get_text("//tr[2]/td[3]")
     assert_equal 'product 2', get_text("//tr[4]/td[3]")
 
-    click "link=Preis"
+    click "link=Listenpreis"
     wait_for_page_to_load "30000"
     assert is_text_present("Suchresultat: 2 Produkte gefunden")
     assert_equal 'product 2', get_text("//tr[2]/td[3]")
     assert_equal 'product 1', get_text("//tr[4]/td[3]")
 
-    click "link=Preis"
+    click "link=Listenpreis"
     wait_for_page_to_load "30000"
     assert is_text_present("Suchresultat: 2 Produkte gefunden")
     assert_equal 'product 1', get_text("//tr[2]/td[3]")

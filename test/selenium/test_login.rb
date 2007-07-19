@@ -12,7 +12,7 @@ class TestLogin < Test::Unit::TestCase
   def test_login
     open "/"
     assert_equal "BBMB", get_title
-    assert is_text_present("Wilkommen bei V")
+    assert is_text_present("Wilkommen bei Virbac")
     assert_equal "E-Mail Adresse", get_text("//label[@for='email']")
     assert is_element_present("email")
     assert_equal "Passwort", get_text("//label[@for='pass']")
@@ -20,6 +20,21 @@ class TestLogin < Test::Unit::TestCase
     assert_match Regexp.new(BBMB.config.http_server), 
       get_attribute("//form[@name='login']@action")
     assert is_element_present("//input[@name='login']")
+  end
+  def test_login__french
+    open "/fr"
+    assert_equal "BBMB", get_title
+    assert is_text_present("Bienvenue chez Virbac")
+    assert_equal "Adresse e-mail", get_text("//label[@for='email']")
+    assert is_element_present("email")
+    assert_equal "Mot de passe", get_text("//label[@for='pass']")
+    assert is_element_present("pass")
+    assert_match Regexp.new(BBMB.config.http_server), 
+      get_attribute("//form[@name='login']@action")
+    assert is_element_present("//input[@name='login']")
+    ## go back to german
+    open "/de"
+    assert is_text_present("Wilkommen bei Virbac")
   end
   def test_login__fail_unknown_user
     open "/"

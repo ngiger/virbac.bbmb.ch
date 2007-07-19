@@ -47,7 +47,7 @@ class TestCurrentOrder < Test::Unit::TestCase
     assert is_element_present("document.forms[2].priority")
     assert is_element_present("commit")
     assert_equal "Bestellung auslösen", get_value("commit")
-    assert is_text_present("Total Sfr.")
+    assert is_text_present("Total (ohne MWSt) Sfr.")
     assert is_element_present("total")
     assert_equal "202.50", get_text("total")
     click "document.forms[2].priority[6]"
@@ -184,13 +184,13 @@ class TestCurrentOrder < Test::Unit::TestCase
     assert is_text_present("Aktuelle Bestellung: 2 Positionen")
     assert_equal "product 1", get_text("//tr[2]/td[4]/a") 
     assert_equal "product 2", get_text("//tr[4]/td[4]/a") 
-    click "link=Preis"
+    click "link=Listenpreis"
     wait_for_page_to_load "30000"
     assert_equal "BBMB | Warenkorb (Home)", get_title
     assert is_text_present("Aktuelle Bestellung: 2 Positionen")
     assert_equal "product 2", get_text("//tr[2]/td[4]/a") 
     assert_equal "product 1", get_text("//tr[4]/td[4]/a") 
-    click "link=Preis"
+    click "link=Listenpreis"
     wait_for_page_to_load "30000"
     assert_equal "BBMB | Warenkorb (Home)", get_title
     assert is_text_present("Aktuelle Bestellung: 2 Positionen")

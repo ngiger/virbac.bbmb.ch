@@ -63,7 +63,7 @@ class TestOrders < Test::Unit::TestCase
     assert_equal "BBMB | Archiv - Bestellung", @selenium.get_title
     assert @selenium.is_text_present("Product 2")
     assert @selenium.is_text_present("Product 3")
-    assert @selenium.is_text_present("Total Sfr. 154.10")
+    assert @selenium.is_text_present("Total (ohne MWSt) Sfr. 154.10")
     assert !@selenium.is_text_present("Interne Bestellnummer")
     assert !@selenium.is_text_present("Bemerkungen")
     assert !@selenium.is_text_present("Versandart")
@@ -74,7 +74,7 @@ class TestOrders < Test::Unit::TestCase
     assert_equal "BBMB | Archiv - Bestellung", @selenium.get_title
     assert @selenium.is_text_present("Product 1")
     assert @selenium.is_text_present("Product 2")
-    assert @selenium.is_text_present("Total Sfr. 108.80")
+    assert @selenium.is_text_present("Total (ohne MWSt) Sfr. 108.80")
     assert @selenium.is_text_present("Interne Bestellnummer")
     assert @selenium.is_text_present("Réf. N°")
     assert @selenium.is_text_present("Bemerkungen")
@@ -98,7 +98,7 @@ class TestOrders < Test::Unit::TestCase
     assert_equal "BBMB | Archiv - Bestellung", @selenium.get_title
     assert @selenium.is_text_present("Product 1")
     assert @selenium.is_text_present("Product 2")
-    assert @selenium.is_text_present("Total Sfr. 108.80")
+    assert @selenium.is_text_present("Total (ohne MWSt) Sfr. 108.80")
     assert @selenium.is_text_present("Interne Bestellnummer")
     assert @selenium.is_text_present("Réf. N°")
     assert @selenium.is_text_present("Bemerkungen")

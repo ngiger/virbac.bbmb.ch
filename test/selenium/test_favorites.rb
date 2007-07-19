@@ -115,7 +115,7 @@ class TestFavorites < Test::Unit::TestCase
     @selenium.click "increment_order"
     @selenium.wait_for_page_to_load "30000"
     assert @selenium.is_text_present("Aktuelle Bestellung: 3 Positionen")
-    assert @selenium.is_text_present("Total Sfr. 266.10")
+    assert @selenium.is_text_present("Total (ohne MWSt) Sfr. 266.10")
     assert_equal [['1', 2], ['2', 8], ['3', 11]], order.collect { |position|
       [position.article_number, position.quantity]
     }
