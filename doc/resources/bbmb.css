@@ -49,6 +49,9 @@ div#catalogue td.catalogue {
   padding: 0px;
   vertical-align: top;
 }
+div#delivery-conditions {
+  margin-top: 1px;
+}
 div#divider {
 	background-color: #039;
   height: 20px;
@@ -68,6 +71,10 @@ div.info {
 }
 div#info td {
   vertical-align: top;
+}
+div.login-foot {
+  font-weight: bold;
+  cursor: pointer;
 }
 div#welcome {
   font-weight: bold;
@@ -218,7 +225,7 @@ td.delete {
   width: 60px;
   font-size: 11px;
 }
-td.new-customer {
+td.login-foot {
   padding-top: 30px;
   vertical-align: top;
 }
@@ -238,6 +245,9 @@ td.right, th.right, td.total, div.right {
 }
 td.total {
   font-weight: bold;
+}
+td.top {
+  vertical-align: top;
 }
 textarea {
 	font-size:12px;

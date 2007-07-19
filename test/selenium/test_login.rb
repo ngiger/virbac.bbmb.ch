@@ -174,6 +174,29 @@ zugeschnittenen, benutzerfreundlichen E-Shop ein! Unsere Mitarbeiter im
 Kundendienst beraten Sie gerne!
     EOS
   end
+  def test__delivery_conditions
+    open "/"
+    assert_equal "BBMB", get_title
+    assert is_text_present "Lieferbedingungen"
+    assert_equal false, is_visible("//div[@id='delivery-conditions']")
+    assert_equal <<-EOS.strip,  get_text("//div[@id='delivery-conditions']")
+Mit der Anmeldung nehme ich die Geschäftsbedingungen zur Kenntnis
+und erkläre mich damit einverstanden, dass Produkte und
+insbesondere Impfstoffe und Biologika bis spätestens Donnerstag,
+14:00 Uhr bestellt werden müssen, um tags darauf geliefert werden
+zu können.
+
+Bei Fragen oder Problemen kontaktieren Sie uns bitte unter
+info@virbac.ch oder 044/809.11.22
+    EOS
+    click "//div[@class='login-foot']"
+    sleep 1
+    assert_equal true, is_visible("//div[@id='delivery-conditions']")
+    click "//div[@class='login-foot']"
+    sleep 1
+    sleep 1
+    assert_equal false, is_visible("//div[@id='delivery-conditions']")
+  end
 end
   end
 end
