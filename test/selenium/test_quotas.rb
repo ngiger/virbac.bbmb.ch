@@ -29,8 +29,9 @@ class TestPromotions < Test::Unit::TestCase
 
     click 'link=Abschlüsse'
     wait_for_page_to_load "30000"
-    assert_equal "BBMB | Abschlüsse", @selenium.get_title
+    assert_equal "BBMB | Abschlüsse", get_title
 
+    assert is_text_present('Abschlusspreis')
     assert_equal 'Product1', get_text('//tr[2]/td[1]')
   end
 end

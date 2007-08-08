@@ -50,15 +50,11 @@ class TestCurrentOrder < Test::Unit::TestCase
     assert is_text_present("Total (ohne MWSt) Sfr.")
     assert is_element_present("total")
     assert_equal "202.50", get_text("total")
-    click "document.forms[2].priority[6]"
-    sleep 0.5
-    assert_equal "252.50", get_text("total")
-    click "document.forms[2].priority[5]"
-    sleep 0.5
-    assert_equal "282.50", get_text("total")
+    click "document.forms[2].priority[4]"
+    assert_equal "202.50", get_text("total")
     refresh
     wait_for_page_to_load "30000"
-    assert_equal "on", get_value("document.forms[2].priority[5]")
+    assert_equal "on", get_value("document.forms[2].priority[4]")
     click "document.forms[2].priority[4]"
     sleep 0.5
     assert_equal "202.50", get_text("total")
@@ -225,6 +221,69 @@ class TestCurrentOrder < Test::Unit::TestCase
     user = login_customer(customer)
     assert_equal "BBMB | Warenkorb (Home)", get_title
     assert is_text_present("im Rückstand")
+  end
+  def test_current_order__quota
+    BBMB.persistence.should_ignore_missing
+    product = Model::Product.new('12345')
+    product.description = 'product - a description'
+    product.price = Util::Money.new(11.50)
+    product.l1_price = Util::Money.new(12.50)
+    product.l1_qty = 2
+    product.l2_price = Util::Money.new(13.50)
+    product.l2_qty = 3
+    email = 'test.customer@bbmb.ch'
+    customer = Model::Customer.new('007')
+    customer.instance_variable_set('@email', email)
+    customer.current_order.add(15, product)
+    user = login_customer(customer)
+    assert_equal "BBMB | Warenkorb (Home)", get_title
+    assert is_text_present("Aktuelle Bestellung: 1 Positionen")
+    assert is_text_present("Sie sind angemeldet als test.customer@bbmb.ch")
+    assert !is_element_present("order_transfer")
+    assert is_element_present("clear_order")
+    assert_equal "Bestellung löschen", get_value("clear_order")
+    assert is_text_present("2 Stk. à 12.50")
+    assert is_text_present("3 Stk. à 13.50")
+    assert is_element_present("reference")
+    assert is_element_present("comment")
+    assert is_element_present("document.forms[2].priority")
+    assert is_element_present("commit")
+    assert_equal "Bestellung auslösen", get_value("commit")
+    assert is_text_present("Total (ohne MWSt) Sfr.")
+    assert is_element_present("total")
+    assert_equal "202.50", get_text("total")
+    click "document.forms[2].priority[4]"
+    assert_equal "202.50", get_text("total")
+    sleep 0.5
+    refresh
+    wait_for_page_to_load "30000"
+    assert_equal "on", get_value("document.forms[2].priority[4]")
+    click "document.forms[2].priority[4]"
+    sleep 0.5
+    assert_equal "202.50", get_text("total")
+    click "document.forms[2].priority[3]"
+    sleep 0.5
+    assert_equal "202.50", get_text("total")
+    click "document.forms[2].priority[2]"
+    sleep 0.5
+    assert_equal "202.50", get_text("total")
+    click "document.forms[2].priority[1]"
+    sleep 0.5
+    assert_equal "202.50", get_text("total")
+=begin # works, but throws an error when run with other tests, reason unclear
+    choose_cancel_on_next_confirmation
+    click("clear_order")
+    assert_equal "BBMB | Warenkorb (Home)", get_title
+    assert is_text_present("Aktuelle Bestellung: 1 Positionen")
+    assert_equal "Wollen Sie wirklich die gesamte Bestellung löschen?",
+                 get_confirmation
+    click("clear_order")
+=end
+    open('/de/clear_order') # <- workaround
+    wait_for_page_to_load "30000"
+    choose_cancel_on_next_confirmation
+    assert_equal "BBMB | Warenkorb (Home)", get_title
+    assert is_text_present("Aktuelle Bestellung: 0 Positionen")
   end
 end
   end

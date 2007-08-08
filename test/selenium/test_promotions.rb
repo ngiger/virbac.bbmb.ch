@@ -60,8 +60,10 @@ class TestPromotions < Test::Unit::TestCase
     assert !is_element_present('link=promo2 20 x 1 Packung')
     assert is_element_present('link=sale1 15 x 1 Packung')
     assert !is_element_present('link=sale2 15 x 1 Packung')
-    assert_equal 'Product1', get_text('//tr[2]/td[1]')
+    assert_equal 'Produkte-Aktionen (1)', get_text('//tr[2]/td[1]')
     assert_equal 'Product2', get_text('//tr[3]/td[1]')
+    assert_equal 'Produkte-Promotionen (1)', get_text('//tr[4]/td[1]')
+    assert_equal 'Product1', get_text('//tr[5]/td[1]')
 
 
     flexstub(Model::Product).should_receive(:find_by_article_number)\

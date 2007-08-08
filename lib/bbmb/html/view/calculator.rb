@@ -16,7 +16,7 @@ class CalculatorList < HtmlGrid::List
   BACKGROUND_SUFFIX = ''
   COMPONENTS = {
     [0,0] => :description,
-    [1,0] => :price,
+    [1,0] => :price_base,
     [2,0] => :price_public,
   }
   CSS_MAP = {

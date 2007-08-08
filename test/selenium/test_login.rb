@@ -180,14 +180,15 @@ Kundendienst beraten Sie gerne!
     assert is_text_present "Lieferbedingungen"
     assert_equal false, is_visible("//div[@id='delivery-conditions']")
     assert_equal <<-EOS.strip,  get_text("//div[@id='delivery-conditions']")
-Mit der Anmeldung nehme ich die Geschäftsbedingungen zur Kenntnis
-und erkläre mich damit einverstanden, dass Produkte und
-insbesondere Impfstoffe und Biologika bis spätestens Donnerstag,
-14:00 Uhr bestellt werden müssen, um tags darauf geliefert werden
-zu können.
+Mit der Anmeldung nehme ich die Geschäftsbedingungen zur Kenntnis.
 
-Bei Fragen oder Problemen kontaktieren Sie uns bitte unter
-info@virbac.ch oder 044/809.11.22
+Bestellungen, die bei uns bis 14.00 Uhr eingehen, treffen
+grundsätzlich am nächsten Arbeitstag beim Kunden ein.
+
+Impfstoff-Bestellungen am späten Donnerstagnachmittag oder am Freitag
+werden wie folgt ausgeliefert: Am darauffolgenden Montag (wenn keine Dringlichkeit vermerkt ist) 
+ Auf Wunsch am Freitag per Mondexpress, dieser wird am Samstagmorgen bis 
+9 Uhr ausgeliefert (Kosten gehen zu Lasten des Kunden)
     EOS
     click "//div[@class='login-foot']"
     sleep 1

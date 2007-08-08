@@ -270,3 +270,7 @@ tr.bg {
 tr#controls {
 	background-color: #FFF;
 }
+tr.divider {
+	background-color: #CCC;
+  border: 1px solid #BBB;
+}

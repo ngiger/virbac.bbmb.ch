@@ -7,6 +7,7 @@ require 'bbmb/html/state/catalogue'
 require 'bbmb/html/state/change_password'
 require 'bbmb/html/state/quotas'
 require 'bbmb/html/state/promotions'
+require 'ostruct'
 
 module BBMB
   module Html
@@ -26,11 +27,7 @@ module Customer
     ChangePassword.new(@session, _customer)
   end
   def promotions
-    products = BBMB.persistence.all(Model::Product).select { |product|
-      (product.promotion && product.promotion.current?) \
-        || (product.sale && product.sale.current?)
-    }
-    State::Promotions.new(@session, products)
+    State::Promotions.new(@session, BBMB.persistence.all(Model::Product))
   end
   def quotas
     State::Quotas.new(@session, _customer.quotas)

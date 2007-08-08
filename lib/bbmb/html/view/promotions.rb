@@ -36,7 +36,9 @@ module PromotionMethods
     end
   end
   def promotions(model)
-    [_promotion(model, :promotion), _promotion(model, :sale)].compact
+    unless(@model.quota model.article_number)
+      [_promotion(model, :promotion), _promotion(model, :sale)].compact
+    end
   end
   def _promotion(model, key)
     if(promo = current_promo(model, key))
@@ -56,10 +58,8 @@ class PromotionsComposite < HtmlGrid::List
   BACKGROUND_SUFFIX = ''
   COMPONENTS = {
     [0,0] => :description,
-    [1,0] => :promotion_lines,
-    [2,0] => :promotion_date,
-    [3,0] => :sale_lines,
-    [4,0] => :sale_date,
+    [1,0] => :lines,
+    [2,0] => :date,
   }
   CSS_CLASS = 'list'
   CSS_HEAD_MAP = {
@@ -69,21 +69,30 @@ class PromotionsComposite < HtmlGrid::List
   CSS_MAP = {
     [0,0] => 'description',
     [2,0] => 'right',
-    [4,0] => 'right',
   }
   SORT_DEFAULT = :description
   SORT_HEADER = false
-  def promotion_date(model)
-    end_date(model, :promotion)
+  def compose(model=@model, offset=[0,0])
+    offset = compose_header(offset) 
+    offset = compose_part(:sale, offset)
+    offset = compose_part(:promotion, offset)
   end
-  def promotion_lines(model)
-    lines(model, :promotion)
+  def compose_part(key, offset)
+    @promo_key = key
+    model = @model.send("%ss" % key)
+    offset = compose_subheader(model, offset)
+    compose_list(model, offset)
   end
-  def sale_date(model)
-    end_date(model, :sale)
+  def compose_subheader(model, offset)
+    @grid.add(@lookandfeel.lookup("subheader_#{@promo_key}", model.size), *offset)
+    @grid.set_row_attributes({'class' => 'divider'}, offset.at(1))
+    resolve_offset(offset, [0,1])
   end
-  def sale_lines(model)
-    lines(model, :sale)
+  def date(model)
+    end_date(model, @promo_key)
+  end
+  def lines(model)
+    super(model, @promo_key)
   end
 end
 class Promotions < Template

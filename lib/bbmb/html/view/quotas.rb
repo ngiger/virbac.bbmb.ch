@@ -32,6 +32,9 @@ class QuotasComposite < HtmlGrid::List
     [0,0] => 'description',
     [1,0,6] => 'right',
   }
+  LOOKANDFEEL_MAP = {
+    :price => :price_quota,
+  }
   SORT_DEFAULT = :description
   SYMBOL_MAP = {
     :end_date   => HtmlGrid::DateValue,

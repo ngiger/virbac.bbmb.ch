@@ -21,7 +21,7 @@ class Products
     [3,1]	=>	:catalogue2,
     [4,0]	=>	:backorder,
     [5,0]	=>	:expiry_date,
-    [6,0] =>  :price,
+    [6,0] =>  :price_base,
     [7,0] =>  :price_levels,
     [8,0] =>  :price2,
     [9,0] =>  :price3,

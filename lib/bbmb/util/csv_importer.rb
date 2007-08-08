@@ -6,6 +6,7 @@ require 'bbmb/model/customer'
 require 'bbmb/model/quota'
 require 'bbmb/model/product'
 require 'bbmb/model/promotion'
+require 'bbmb/util/mail'
 require 'date'
 require 'encoding/character/utf-8'
 require 'iconv'
@@ -56,6 +57,10 @@ module BBMB
         'd' => 'de',
         'f' => 'fr',
       }
+      def initialize
+        super
+        @duplicates = []
+      end
       def import_record(record)
         customer_id = string(record[0])
         active = string(record[1]) == 'A'
@@ -79,6 +84,17 @@ module BBMB
           }
         end
         customer
+      rescue Yus::DuplicateNameError => err
+        @duplicates.push(err)
+        nil
+      end
+      def postprocess(persistence)
+        super
+        unless(@duplicates.empty?)
+          err = @duplicates.shift
+          @duplicates.each { |other| err.message << "\n" << other.message }
+          Util::Mail.notify_error(err)
+        end
       end
     end
     class ProductImporter < CsvImporter
