@@ -51,8 +51,8 @@ class CurrentPositions
     [0,0]     => 'delete',
     [1,0]     => 'tiny right',
     [3,0]     => 'description',
-    [6,0,4,2] => 'right',
-    [10,0]    => 'total',
+    [6,0,4,2] => 'right stable',
+    [10,0]    => 'total stable',
     [11,0]    => 'right',
   }
   CSS_HEAD_MAP = {

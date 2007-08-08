@@ -72,6 +72,9 @@ div.info {
 div#info td {
   vertical-align: top;
 }
+div.limited {
+  max-width: 90px;
+}
 div.login-foot {
   font-weight: bold;
   cursor: pointer;
@@ -243,6 +246,9 @@ td.processingerror {
 }
 td.right, th.right, td.total, div.right {
   text-align: right;
+}
+td.stable {
+  white-space: nowrap;
 }
 td.total {
   font-weight: bold;
