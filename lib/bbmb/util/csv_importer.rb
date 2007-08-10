@@ -176,20 +176,29 @@ module BBMB
         end
       end
       def postprocess(persistence)
+        deletables = []
         persistence.all(BBMB::Model::Product) { |product|
           unless(@active_products.include?(product.article_number))
-            persistence.delete(product)
+            deletables.push product
           end
         }
-        persistence.all(BBMB::Model::Order::Position) { |position|
-          position.product.nil? && persistence.delete(position)
-        }
         persistence.all(BBMB::Model::Customer) { |customer|
-          positions = customer.current_order.positions
-          positions.compact! && persistence.save(positions)
+          order = customer.current_order
           quotas = customer.quotas
-          quotas.compact! && persistence.save(quotas)
+          deleted_quotas = []
+          deletables.each { |product|
+            order.add(0, product)
+            if(quota = customer.quota(product.article_number))
+              quotas.delete(quota)
+              deleted_quotas.push(quota)
+            end
+          }
+          unless(deleted_quotas.empty?)
+            persistence.save(quotas)
+            persistence.delete(*deleted_quotas)
+          end
         }
+        persistence.delete(*deletables) unless(deletables.empty?)
       end
     end
     class QuotaImporter < CsvImporter
