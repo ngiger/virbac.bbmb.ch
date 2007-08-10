@@ -22,7 +22,9 @@ class TestLogin < Test::Unit::TestCase
     assert is_element_present("//input[@name='login']")
   end
   def test_login__french
-    open "/fr"
+    open "/"
+    click "link=Français"
+    wait_for_page_to_load "30000"
     assert_equal "BBMB", get_title
     assert is_text_present("Bienvenue chez Virbac")
     assert_equal "Adresse e-mail", get_text("//label[@for='email']")

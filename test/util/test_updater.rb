@@ -18,7 +18,8 @@ module BBMB
         BBMB.config = config = flexmock('Config')
         importers = {
           'ABSCHLUSS.CSV' => 'QuotaImporter',
-          'ARTIKEL.CSV'   => 'ProductImporter',
+          'ARTIKEL.CSV'   => ['ProductImporter', :de],
+          'ARTIKEL_FR.CSV'   => ['ProductImporter', :fr],
           'KUNDEN.CSV'    => 'CustomerImporter',
         }
         config.should_receive(:importers).and_return(importers)
@@ -34,7 +35,7 @@ module BBMB
           }
           importer
         }
-        Updater.import("CustomerImporter", "data")
+        Updater.import("CustomerImporter", [], "data")
       end
       def test_import_products
         BBMB.logger = flexmock("logger")
@@ -47,7 +48,7 @@ module BBMB
           }
           importer
         }
-        Updater.import("ProductImporter", "data")
+        Updater.import("ProductImporter", [], "data")
       end
       def test_import_quotas
         BBMB.logger = flexmock("logger")
@@ -60,12 +61,13 @@ module BBMB
           }
           importer
         }
-        Updater.import("QuotaImporter", "data")
+        Updater.import("QuotaImporter", [], "data")
       end
       def test_run__customers
         flexstub(Updater).should_receive(:import).times(1).and_return { 
-          |importer, data, prs|
+          |importer, args, data|
           assert_equal("CustomerImporter", importer)
+          assert_equal([], args)
           assert_equal("mockdata", data)
         }
         flexstub(PollingManager).should_receive(:new).and_return { 
@@ -79,8 +81,9 @@ module BBMB
       end
       def test_run__products
         flexstub(Updater).should_receive(:import).times(1).and_return { 
-          |importer, data, prs|
+          |importer, args, data|
           assert_equal("ProductImporter", importer)
+          assert_equal([:de], args)
           assert_equal("mockdata", data)
         }
         flexstub(PollingManager).should_receive(:new).and_return { 
@@ -92,10 +95,27 @@ module BBMB
         }
         Updater.run
       end
+      def test_run__products_fr
+        flexstub(Updater).should_receive(:import).times(1).and_return { 
+          |importer, args, data|
+          assert_equal("ProductImporter", importer)
+          assert_equal([:fr], args)
+          assert_equal("mockdata", data)
+        }
+        flexstub(PollingManager).should_receive(:new).and_return { 
+          mgr = flexmock("PollingManager")
+          mgr.should_receive(:poll_sources).and_return { |block|
+            block.call("ARTIKEL_FR.CSV", "mockdata")
+          }
+          mgr
+        }
+        Updater.run
+      end
       def test_run__quotas
         flexstub(Updater).should_receive(:import).times(1).and_return { 
-          |importer, data, prs|
+          |importer, args, data|
           assert_equal("QuotaImporter", importer)
+          assert_equal([], args)
           assert_equal("mockdata", data)
         }
         flexstub(PollingManager).should_receive(:new).and_return { 

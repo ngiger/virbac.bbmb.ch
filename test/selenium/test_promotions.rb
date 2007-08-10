@@ -16,36 +16,43 @@ class TestPromotions < Test::Unit::TestCase
 
     today = Date.today
     promo1 = Model::Promotion.new
-    promo1.lines = ['promo1 20 x 1 Packung']
+    promo1.lines.de = ['promo1 20 x 1 Packung']
+    promo1.lines.fr = ['la première promotion']
     promo1.start_date = today - 1
     promo1.end_date = today + 1
 
     prod1 = Model::Product.new(12345)
-    prod1.description = 'Product1'
+    prod1.description.de = 'Product1'
+    prod1.description.fr = 'FrenchProduct1'
     prod1.price = Util::Money.new(10.0)
     prod1.promotion = promo1
 
     promo2 = Model::Promotion.new
-    promo2.lines = ['promo2 20 x 1 Packung']
+    promo2.lines.de = ['promo2 20 x 1 Packung']
+    promo1.lines.fr = ['la deuxième promotion']
     promo2.start_date = today - 2
     promo2.end_date = today - 1
     sale1 = Model::Promotion.new
-    sale1.lines = ['sale1 15 x 1 Packung']
+    sale1.lines.de = ['sale1 15 x 1 Packung']
+    sale1.lines.fr = ['la première action']
     sale1.start_date = today - 1
     sale1.end_date = today + 1
 
     prod2 = Model::Product.new(12346)
-    prod2.description = 'Product2'
+    prod2.description.de = 'Product2'
+    prod2.description.fr = 'FrenchProduct2'
     prod2.price = Util::Money.new(20.0)
     prod2.promotion = promo2
     prod2.sale = sale1
 
     sale2 = Model::Promotion.new
-    sale2.lines = ['sale2 15 x 1 Packung']
+    sale2.lines.de = ['sale2 15 x 1 Packung']
+    sale2.lines.fr = ['la deuxième action']
     sale2.start_date = today - 2
     sale2.end_date = today - 1
     prod3 = Model::Product.new(12346)
-    prod3.description = 'Product3'
+    prod3.description.de = 'Product3'
+    prod3.description.fr = 'FrenchProduct3'
     prod3.price = Util::Money.new(30.0)
 
     #Model::Product.instances.push(prod1, prod2, prod3)

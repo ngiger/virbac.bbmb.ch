@@ -27,7 +27,8 @@ class TestResult < Test::Unit::TestCase
   def test_result__1
     user = login_customer
     product = Model::Product.new('12345')
-    product.description = 'product - a description'
+    product.description.de = 'product - a description'
+    product.description.fr = 'a french product - une description'
     product.price = Util::Money.new(12.50)
     flexstub(Model::Product).should_receive(:search_by_description).times(1).and_return { 
       |query|
@@ -39,6 +40,7 @@ class TestResult < Test::Unit::TestCase
     wait_for_page_to_load "30000"
     assert_equal "BBMB | Suchen", get_title
     assert is_text_present("Suchresultat: 1 Produkt gefunden")
+    assert is_text_present("product - a description")
     assert is_element_present("//input[@type='text' and @name='query']")
     assert is_element_present("//input[@type='submit' and @name='order_product']")
     assert is_element_present("//input[@name='quantity[12345]']")
@@ -49,7 +51,8 @@ class TestResult < Test::Unit::TestCase
     BBMB.persistence.should_ignore_missing
     user = login_customer
     product = Model::Product.new('12345')
-    product.description = 'product - a description'
+    product.description.de = 'product - a description'
+    product.description.fr = 'a french product - une description'
     product.price = Util::Money.new(11.50)
     flexstub(Model::Product).should_receive(:search_by_description).times(1).and_return { 
       |query|
@@ -73,7 +76,8 @@ class TestResult < Test::Unit::TestCase
   def test_result__backorder
     user = login_customer
     product = Model::Product.new('12345')
-    product.description = 'product - a description'
+    product.description.de = 'product - a description'
+    product.description.fr = 'a french product - une description'
     product.price = Util::Money.new(12.50)
     product.backorder = true
     flexstub(Model::Product).should_receive(:search_by_description).times(1).and_return { 
@@ -91,7 +95,8 @@ class TestResult < Test::Unit::TestCase
   def test_result__backorder__date
     user = login_customer
     product = Model::Product.new('12345')
-    product.description = 'product - a description'
+    product.description.de = 'product - a description'
+    product.description.fr = 'a french product - une description'
     product.price = Util::Money.new(12.50)
     product.backorder = true
     date = Date.today >> 1
@@ -112,10 +117,10 @@ class TestResult < Test::Unit::TestCase
   def test_result__sort
     user = login_customer
     product1 = Model::Product.new('12345')
-    product1.description = 'product 1'
+    product1.description.de = 'product 1'
     product1.price = Util::Money.new(12.50)
     product2 = Model::Product.new('12345')
-    product2.description = 'product 2'
+    product2.description.de = 'product 2'
     product2.price = Util::Money.new(10.50)
     flexstub(Model::Product).should_receive(:search_by_description).times(1).and_return { 
       |query|
@@ -146,7 +151,8 @@ class TestResult < Test::Unit::TestCase
     BBMB.persistence.should_ignore_missing
     user = login_customer
     product = Model::Product.new('12345')
-    product.description = 'product - a description'
+    product.description.de = 'product - a description'
+    product.description.fr = 'a french product - une description'
     product.price = Util::Money.new(11.50)
     @customer.current_order.add(5, product)
     flexstub(Model::Product).should_receive(:search_by_description).times(1).and_return { 
@@ -179,8 +185,10 @@ class TestResult < Test::Unit::TestCase
     promo = Model::Promotion.new
     promo.start_date = today - 2
     promo.end_date = today
+    promo.lines.de = ["Now more for less!"]
     product = Model::Product.new('12345')
-    product.description = 'product - a description'
+    product.description.de = 'product - a description'
+    product.description.fr = 'a french product - une description'
     product.price = Util::Money.new(11.50)
     product.promotion = promo
     flexstub(Model::Product).should_receive(:search_by_description).times(1).and_return { 
@@ -225,8 +233,10 @@ class TestResult < Test::Unit::TestCase
     promo = Model::Promotion.new
     promo.start_date = today - 2
     promo.end_date = today
+    promo.lines.de = ["Now more for less!"]
     product = Model::Product.new('12345')
-    product.description = 'product - a description'
+    product.description.de = 'product - a description'
+    product.description.fr = 'a french product - une description'
     product.price = Util::Money.new(11.50)
     product.sale = promo
     flexstub(Model::Product).should_receive(:search_by_description).times(1).and_return { 

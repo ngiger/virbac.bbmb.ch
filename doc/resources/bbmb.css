@@ -75,6 +75,25 @@ div#info td {
 div.limited {
   max-width: 90px;
 }
+div#language-chooser {
+  float: right;
+}
+div#language-chooser a {
+  padding: 0px 4px;
+  border-left: 1px solid black;
+}
+div#language-chooser a:first-child {
+  border-left: 0px;
+}
+div#language-chooser a {
+  color: black;
+}
+div#language-chooser a:link, div#language-chooser a:visited {
+  color: blue;
+}
+div#language-chooser a:hover {
+  color: black;
+}
 div.login-foot {
   font-weight: bold;
   cursor: pointer;

@@ -16,7 +16,8 @@ class TestPromotions < Test::Unit::TestCase
     assert_equal "BBMB | Warenkorb (Home)", @selenium.get_title
 
     prod1 = Model::Product.new(12345)
-    prod1.description = 'Product1'
+    prod1.description.de = 'Product1'
+    prod1.description.fr = 'FrenchProduct1'
     prod1.price = Util::Money.new(10.0)
     quota = Model::Quota.new(prod1)
     quota.start_date = Date.new(2007)

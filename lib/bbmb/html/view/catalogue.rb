@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # Html::View::Catalogue -- bbmb -- 16.04.2007 -- hwyss@ywesee.com
 
+require 'bbmb/html/util/multilingual'
 require 'bbmb/html/view/template'
 
 module BBMB
@@ -22,6 +23,7 @@ module CatalogueMethods
   end
 end
 class CatalogueList < HtmlGrid::List
+  include Util::Multilingual
   BACKGROUND_SUFFIX = ''
   COMPONENTS = { 
     [0,0] => :link,
@@ -38,7 +40,7 @@ class CatalogueList < HtmlGrid::List
   end
   def catalogue(model)
     cat = @session.persistent_user_input(:category) || []
-    if(model.is_a?(Array) && cat.include?(model.first))# && model.last.is_a?(Array))
+    if(model.is_a?(Array) && cat.include?(model.first))
       CatalogueList.new(model, @session, self)
     end
   end
@@ -58,7 +60,7 @@ class CatalogueList < HtmlGrid::List
       link.value = nxt
     else
       quantity = 'quantity[%s]' % model.article_number
-      link.value = model.description
+      link.value = _(model.description)
       link.href = @lookandfeel._event_url(:increment_order, 
                                           quantity => 1)
     end

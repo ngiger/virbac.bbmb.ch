@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # Html::View::Promotions -- bbmb -- 11.04.2007 -- hwyss@ywesee.com
 
+require 'bbmb/html/view/multilingual'
 require 'bbmb/html/view/template'
 require 'htmlgrid/datevalue'
 
@@ -8,6 +9,7 @@ module BBMB
   module Html
     module View
 module PromotionMethods
+  include Util::Multilingual
   def current_promo(model, key)
     if((promo = model.send(key)) && promo.current?)
       promo
@@ -19,8 +21,9 @@ module PromotionMethods
     end
   end
   def lines(model, key)
-    if(promo = current_promo(model, key))
-      lines = promo.lines.collect { |line|
+    if((promo = current_promo(model, key)) \
+       && (lines = _(promo.lines)))
+      lines = lines.collect { |line|
         num = 1
         if(match = /(\d+)\s*x\s*\d/.match(line.to_s))
           num = match[1].to_i
@@ -53,6 +56,7 @@ module PromotionMethods
   end
 end
 class PromotionsComposite < HtmlGrid::List
+  include Multilingual
   include PromotionMethods
   BACKGROUND_ROW = 'bg'
   BACKGROUND_SUFFIX = ''

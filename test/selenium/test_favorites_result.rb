@@ -34,7 +34,8 @@ class TestFavoritesResult < Test::Unit::TestCase
     assert_equal "BBMB | Schnellbestellung", @selenium.get_title
 
     product = Model::Product.new('12345')
-    product.description = 'product - a description'
+    product.description.de = 'product - a description'
+    product.description.fr = 'a french product - une description'
     product.price = Util::Money.new(12.50)
     flexstub(Model::Product).should_receive(:search_by_description).times(1).and_return { 
       |query|
@@ -47,6 +48,7 @@ class TestFavoritesResult < Test::Unit::TestCase
 
     assert_equal "BBMB | Suchen", @selenium.get_title
     assert @selenium.is_text_present("Suchresultat: 1 Produkt gefunden")
+    assert @selenium.is_text_present("product - a description")
     assert @selenium.is_element_present("//input[@type='text' and @name='query']")
     assert !@selenium.is_element_present("//input[@type='submit' and @name='order_product']")
     assert @selenium.is_element_present("//input[@name='quantity[12345]']")
@@ -60,7 +62,7 @@ class TestFavoritesResult < Test::Unit::TestCase
     assert_equal "BBMB | Schnellbestellung", @selenium.get_title
 
     product = Model::Product.new('12345')
-    product.description = 'product - a description'
+    product.description.de = 'product - a description'
     product.price = Util::Money.new(12.50)
     product.backorder = true
     flexstub(Model::Product).should_receive(:search_by_description).times(1).and_return { 

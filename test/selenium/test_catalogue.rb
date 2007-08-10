@@ -15,21 +15,24 @@ class TestCatalogue < Test::Unit::TestCase
     assert_equal "BBMB | Warenkorb (Home)", @selenium.get_title
 
     prod1 = Model::Product.new(12345)
-    prod1.catalogue1 = 'Kleintiere'
-    prod1.catalogue2 = 'Zahnhygiene'
-    prod1.description = 'Product1'
+    prod1.catalogue1.de = 'Kleintiere'
+    prod1.catalogue1.fr = 'Petits Animaux'
+    prod1.catalogue2.de = 'Zahnhygiene'
+    prod1.catalogue2.fr = 'Hygiène buccodentaire'
+    prod1.description.de = 'Product1'
+    prod1.description.fr = 'FrenchProduct1'
     prod1.price = Util::Money.new(10.0)
 
     prod2 = Model::Product.new(12346)
-    prod2.catalogue1 = 'Großtiere'
-    prod2.catalogue2 = 'Antiphlogistika'
-    prod2.description = 'Product2'
+    prod2.catalogue1.de = 'Großtiere'
+    prod2.catalogue2.de = 'Antiphlogistika'
+    prod2.description.de = 'Product2'
     prod2.price = Util::Money.new(20.0)
 
     prod3 = Model::Product.new(12346)
-    prod3.catalogue1 = 'Großtiere'
-    prod3.catalogue2 = 'Gastroenterologika'
-    prod3.description = 'Product3'
+    prod3.catalogue1.fr = 'Großtiere'
+    prod3.catalogue2.fr = 'Gastroenterologika'
+    prod3.description.fr = 'Product3'
     prod3.price = Util::Money.new(30.0)
 
     #Model::Product.instances.push(prod1, prod2, prod3)

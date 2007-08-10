@@ -63,6 +63,7 @@ module BBMB
       end
       def import_record(record)
         customer_id = string(record[0])
+        return unless(/^\d+$/.match(customer_id))
         active = string(record[1]) == 'A'
         customer = Model::Customer.find_by_customer_id(customer_id)
         if(customer.nil? && active)
@@ -98,6 +99,11 @@ module BBMB
       end
     end
     class ProductImporter < CsvImporter
+      def initialize(language)
+        super()
+        @language = language
+        @active_products = {}
+      end
       VAT = {
         '1' => 2.4,
         '2' => 7.6,
@@ -126,37 +132,55 @@ module BBMB
       }
       def import_record(record)
         article_number = string(record[0])
+        return unless(/^\d+$/.match(article_number))
+        @active_products.store article_number, true
         product = Model::Product.find_by_article_number(article_number) \
           || Model::Product.new(article_number)
         PRODUCT_MAP.each { |idx, name|
           value = string(record[idx])
+          writer = "#{name}="
           case name
+          when *product.multilinguals
+            product.send(name).send("#@language=", value)
           when :expiry_date, :backorder_date
-            value = date(value)
+            product.send(writer, date(value))
           when :vat
-            value = VAT[value]
+            product.send(writer, VAT[value])
           when :status
-            value = (value == 'A') ? :active : :inactive
+            product.send(writer, (value == 'A') ? :active : :inactive)
+          else
+            product.send(writer, value)
           end
-          product.send("#{name}=", value)
         }
-        product.promotion = import_promotion(record, 19)
-        product.sale = import_promotion(record, 25)
+        product.promotion = import_promotion(product.promotion, record, 19)
+        product.sale = import_promotion(product.sale, record, 25)
         product
       end
-      def import_promotion(record, offset)
+      def import_promotion(previous, record, offset)
         lines = []
         4.times { |idx|
           lines.push(string(record[offset + idx]))
         }
         lines.compact!
-        unless(lines.empty?)
-          promotion = Model::Promotion.new
-          promotion.lines.replace(lines)
-          promotion.start_date = date(record[offset + 4])
-          promotion.end_date = date(record[offset + 5])
-          promotion
+        if(@language == :de)
+          unless(lines.empty?)
+            promotion = Model::Promotion.new
+            promotion.lines.de = lines
+            promotion.start_date = date(record[offset + 4])
+            promotion.end_date = date(record[offset + 5])
+            promotion
+          end
+        elsif(previous)
+          previous.lines.send("#@language=", lines)
+          previous
         end
+      end
+      def postprocess(persistence)
+        persistence.all(BBMB::Model::Product) { |product|
+          unless(@active_products.include?(product.article_number))
+            persistence.delete(product)
+          end
+        }
       end
     end
     class QuotaImporter < CsvImporter
@@ -175,6 +199,7 @@ module BBMB
       end
       def import_record(record)
         customer_id = string(record[0])
+        return unless(/^\d+$/.match(customer_id))
         art_id = string(record[3])
         if((custmr = Model::Customer.find_by_customer_id(customer_id)) \
            && (product = Model::Product.find_by_article_number(art_id)))

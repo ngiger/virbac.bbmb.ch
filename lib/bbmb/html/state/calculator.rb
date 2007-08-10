@@ -2,6 +2,7 @@
 # Html::State::Calculator -- bbmb -- 18.04.2007 -- hwyss@ywesee.com
 
 require 'bbmb/html/state/global'
+require 'bbmb/html/util/multilingual'
 require 'bbmb/html/view/calculator'
 require 'ostruct'
 
@@ -13,13 +14,14 @@ class AjaxCalculator < Global
   VOLATILE = true
 end
 class Calculator < Global
+  include Util::Multilingual
   DIRECT_EVENT = :calculator
   VIEW = Html::View::Calculator
   def init
     super
     data = {}
     @model.each { |product|
-      if(cat = product.catalogue1)
+      if(cat = _(product.catalogue1))
         (data[cat] ||= []).push(product)
       end
     }

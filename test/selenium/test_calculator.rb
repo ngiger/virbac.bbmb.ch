@@ -15,14 +15,16 @@ class TestCalculator < Test::Unit::TestCase
     assert_equal "BBMB | Warenkorb (Home)", @selenium.get_title
 
     prod1 = BBMB::Model::Product.new(12345)
-    prod1.catalogue1 = 'Kleintiere'
-    prod1.description = 'Product1'
+    prod1.catalogue1.de = 'Kleintiere'
+    prod1.description.de = 'Product1'
+    prod1.description.fr = 'FrenchProduct1'
     prod1.price = BBMB::Util::Money.new(10.00)
     prod1.vat = BBMB::Util::Money.new(10.00)
 
     prod2 = BBMB::Model::Product.new(12346)
-    prod2.catalogue1 = 'Großtiere'
-    prod2.description = 'Product2'
+    prod2.catalogue1.de = 'Großtiere'
+    prod2.description.de = 'Product2'
+    prod2.description.fr = 'FrenchProduct2'
     prod2.price = BBMB::Util::Money.new(20.00)
     prod2.vat = BBMB::Util::Money.new(5.00)
 

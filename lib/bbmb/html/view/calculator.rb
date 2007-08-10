@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # Html::View::Calculator -- bbmb -- 18.04.2007 -- hwyss@ywesee.com
 
+require 'bbmb/html/view/multilingual'
 require 'bbmb/html/view/template'
 require 'bbmb/html/view/list_prices'
 require 'htmlgrid/divform'
@@ -11,6 +12,7 @@ module BBMB
   module Html
     module View
 class CalculatorList < HtmlGrid::List
+  include Multilingual
   include Vat
   BACKGROUND_ROW = 'bg'
   BACKGROUND_SUFFIX = ''

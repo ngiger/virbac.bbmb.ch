@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # Html::View::Quotas -- bbmb -- 11.04.2007 -- hwyss@ywesee.com
 
+require 'bbmb/html/view/multilingual'
 require 'bbmb/html/view/template'
 require 'htmlgrid/datevalue'
 
@@ -8,6 +9,7 @@ module BBMB
   module Html
     module View
 class QuotasComposite < HtmlGrid::List
+  include Multilingual
   BACKGROUND_ROW = 'bg'
   BACKGROUND_SUFFIX = ''
   COMPONENTS = {
