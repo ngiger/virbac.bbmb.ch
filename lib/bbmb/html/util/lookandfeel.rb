@@ -292,14 +292,15 @@ exclusivement avec notre accord
       :delete                   =>  "Supprimer",
       :delivery_conditions      =>  "Conditions de livraison",
       :delivery_conditions_text =>  <<-EOS,
-Par mon inscription je prends connaissance des conditions générales
-et je confirme que je suis d'accord que les produits, dont surtout
-les vaccins et produits biologiques, doivent être commandés
-jusqu'au jeudi 14 h 00 au plus tard, pour pouvoir être livrés le
-lendemain.
+Avec l’inscription je prends note des conditions générales
 
-Pour toute question ou tout problème, veuillez nous contacter sous
-<a href="mailto:info@virbac.ch">info@virbac.ch</a> ou au 044/809.11.22
+Les commandes qui nous parviennent jusqu’à 14.00 heures seront 
+en principe chez le client le jour suivant.
+
+Les commandes de vaccins qui nous parviennent le jeudi, en fin 
+d’après-midi, ou le vendredi seront expédiées comme suit:<ul><li> Le lundi suivant s’il n’y a pas d’urgence, </li>
+<li> sur demande le vendredi par express, sera livrée samedi matin 
+     jusqu’à 9 h (frais de port en charge du client) </li></ul>
       EOS
       :default_values           =>  "Revenir au début",
       :drtitle                  =>  "Titre",
