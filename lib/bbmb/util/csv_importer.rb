@@ -181,6 +181,12 @@ module BBMB
             persistence.delete(product)
           end
         }
+        persistence.all(BBMB::Model::Customer) { |customer|
+          quotas = customer.quotas
+          quotas.compact! && persistence.save(quotas)
+          positions = customer.current_order.positions
+          positions.compact! && persistence.save(positions)
+        }
       end
     end
     class QuotaImporter < CsvImporter

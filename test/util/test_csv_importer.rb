@@ -150,8 +150,12 @@ module BBMB
           assert_equal(Date.new(2007,4,30), product.backorder_date)
         }
         persistence.should_receive(:all).and_return { |klass, block|
-          assert_equal(BBMB::Model::Product, klass) 
-          block.call(existing)
+          case klass
+          when BBMB::Model::Product
+            block.call(existing)
+          when BBMB::Model::Customer
+            block.call(klass.new)
+          end
         }
         persistence.should_receive(:delete).with(existing)
         ProductImporter.new(:de).import(line, persistence)
