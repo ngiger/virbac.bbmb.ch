@@ -23,9 +23,12 @@ module PromotionMethods
   def lines(model, key)
     if((promo = current_promo(model, key)) \
        && (lines = _(promo.lines)))
-      lines = lines.collect { |line|
+      output = []
+      lines.each_with_index { |line, idx|
         num = 1
-        if(match = /(\d+)\s*x\s*\d/.match(line.to_s))
+        if(qty = promo.qty_level(idx + 1))
+          num = qty
+        elsif(match = /(\d+)\s*x\s*\d/.match(line.to_s))
           num = match[1].to_i
         end
         quantity = 'quantity[%s]' % model.article_number
@@ -34,8 +37,9 @@ module PromotionMethods
         link.href = @lookandfeel._event_url(:order_product, 
                                             quantity => num)
         link.css_class = 'block'
-        link
+        output.push link
       }
+      output
     end
   end
   def promotions(model)
@@ -49,10 +53,17 @@ module PromotionMethods
       link.css_class = key.to_s
       link.css_id = sprintf "%s-%s", key,  model.article_number
       lines = [@lookandfeel.lookup('%s_explain' % key)]
-      link.dojo_title = lines + lines(model, key)
+      link.dojo_title = lines + (lines(model, key) || [])
       link.href = @lookandfeel._event_url(:promotions)
       link
     end
+  end
+  def quantity(model)
+    qty = model.quantity
+    if(freebies = model.freebies)
+      qty = sprintf("%s + %s", qty, freebies)
+    end
+    qty
   end
 end
 class PromotionsComposite < HtmlGrid::List

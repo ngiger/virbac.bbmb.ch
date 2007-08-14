@@ -287,6 +287,43 @@ class TestCurrentOrder < Test::Unit::TestCase
     assert_equal "BBMB | Warenkorb (Home)", get_title
     assert is_text_present("Aktuelle Bestellung: 0 Positionen")
   end
+  def test_current_order__freebies
+    BBMB.persistence.should_ignore_missing
+    product = Model::Product.new('12345')
+    product.description.de = 'product - a description'
+    product.price = Util::Money.new(15.50)
+    product.l1_price = Util::Money.new(14.50)
+    product.l1_qty = 2
+    product.l2_price = Util::Money.new(13.50)
+    product.l2_qty = 3
+    product.promotion = promo = Model::Promotion.new
+    promo.l1_price = Util::Money.new(12.50) 
+    promo.l1_qty = 3
+    promo.l1_free = 2
+    promo.start_date = Date.today - 1
+    promo.end_date = Date.today + 1
+    email = 'test.customer@bbmb.ch'
+    customer = Model::Customer.new('007')
+    customer.instance_variable_set('@email', email)
+    customer.current_order.add(10, product)
+    user = login_customer(customer)
+    assert_equal "BBMB | Warenkorb (Home)", get_title
+    assert is_text_present("Aktuelle Bestellung: 1 Positionen")
+    assert is_text_present("Sie sind angemeldet als test.customer@bbmb.ch")
+    assert !is_element_present("order_transfer")
+    assert is_element_present("clear_order")
+    assert_equal "Bestellung löschen", get_value("clear_order")
+    assert is_text_present("10 + 2")
+    assert is_text_present("3 Stk. à 12.50")
+    assert is_element_present("reference")
+    assert is_element_present("comment")
+    assert is_element_present("document.forms[2].priority")
+    assert is_element_present("commit")
+    assert_equal "Bestellung auslösen", get_value("commit")
+    assert is_text_present("Total (ohne MWSt) Sfr.")
+    assert is_element_present("total")
+    assert_equal "125.00", get_text("total")
+  end
 end
   end
 end

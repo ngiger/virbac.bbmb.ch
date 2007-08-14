@@ -20,6 +20,8 @@ class TestPromotions < Test::Unit::TestCase
     promo1.lines.fr = ['la première promotion']
     promo1.start_date = today - 1
     promo1.end_date = today + 1
+    promo1.l1_qty = 1
+    promo1.l1_free = 20
 
     prod1 = Model::Product.new(12345)
     prod1.description.de = 'Product1'

@@ -130,6 +130,24 @@ module BBMB
         31  =>  :backorder,
         32  =>  :backorder_date,
       }
+      PROMOTION_MAP = {
+        0   =>  :l1_qty,
+        1   =>  :l1_free,
+        2   =>  :l1_price,
+        3   =>  :l1_discount,
+        4   =>  :l2_qty,
+        5   =>  :l2_free,
+        6   =>  :l2_price,
+        7   =>  :l2_discount,
+        8   =>  :l3_qty,
+        9   =>  :l3_free,
+        10  =>  :l3_price,
+        11  =>  :l3_discount,
+        12  =>  :l4_qty,
+        13  =>  :l4_free,
+        14  =>  :l4_price,
+        15  =>  :l4_discount,
+      }
       def import_record(record)
         article_number = string(record[0])
         return unless(/^\d+$/.match(article_number))
@@ -152,11 +170,11 @@ module BBMB
             product.send(writer, value)
           end
         }
-        product.promotion = import_promotion(product.promotion, record, 19)
-        product.sale = import_promotion(product.sale, record, 25)
+        product.promotion = import_promotion(product.promotion, record, 19, 33)
+        product.sale = import_promotion(product.sale, record, 25, 49)
         product
       end
-      def import_promotion(previous, record, offset)
+      def import_promotion(previous, record, offset, offset2)
         lines = []
         4.times { |idx|
           lines.push(string(record[offset + idx]))
@@ -168,6 +186,21 @@ module BBMB
             promotion.lines.de = lines
             promotion.start_date = date(record[offset + 4])
             promotion.end_date = date(record[offset + 5])
+            PROMOTION_MAP.sort.each { |idx, name|
+              value = string(record[idx + offset2]).to_f
+              if(value > 0)
+                case name.to_s
+                when /l(\d)_discount/
+                  pricename = "l#{$1}_price"
+                  index = PRODUCT_MAP.index(pricename.to_sym)
+                  if(promotion.send(pricename).nil? \
+                     && (price = string(record[index])))
+                    promotion.send(pricename << "=", price)
+                  end
+                end
+                promotion.send("#{name}=", value)
+              end
+            }
             promotion
           end
         elsif(previous)
