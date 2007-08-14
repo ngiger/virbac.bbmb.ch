@@ -189,15 +189,6 @@ module BBMB
             PROMOTION_MAP.sort.each { |idx, name|
               value = string(record[idx + offset2]).to_f
               if(value > 0)
-                case name.to_s
-                when /l(\d)_discount/
-                  pricename = "l#{$1}_price"
-                  index = PRODUCT_MAP.index(pricename.to_sym)
-                  if(promotion.send(pricename).nil? \
-                     && (price = string(record[index])))
-                    promotion.send(pricename << "=", price)
-                  end
-                end
                 promotion.send("#{name}=", value)
               end
             }
