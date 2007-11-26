@@ -200,6 +200,7 @@ module BBMB
         end
       end
       def postprocess(persistence)
+        return if(@active_products.empty?)
         deletables = []
         persistence.all(BBMB::Model::Product) { |product|
           unless(@active_products.include?(product.article_number))
