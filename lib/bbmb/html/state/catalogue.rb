@@ -22,7 +22,7 @@ class Catalogue < Global
         if(key1 = _ product.catalogue1)
           level2 = (level1[key1] ||= {})
           if(key2 = _ product.catalogue2)
-            level3 = (level2[] ||= [])
+            level3 = (level2[key2] ||= [])
             level3.push(product) if(_ product.description)
           end
         end
