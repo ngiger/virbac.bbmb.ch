@@ -19,9 +19,13 @@ class Catalogue < Global
       products.delete_if { |product|
         product.catalogue1.nil? 
       }.each { |product|
-        level2 = (level1[_ product.catalogue1] ||= {})
-        level3 = (level2[_ product.catalogue2] ||= [])
-        level3.push(product)
+        if(key1 = _ product.catalogue1)
+          level2 = (level1[key1] ||= {})
+          if(key2 = _ product.catalogue2)
+            level3 = (level2[] ||= [])
+            level3.push(product) if(_ product.description)
+          end
+        end
       }
       concat level1.sort.collect { |key2, level2|
         [key2, level2.sort.collect { |key3, level3|
