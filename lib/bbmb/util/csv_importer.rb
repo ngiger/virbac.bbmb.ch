@@ -265,7 +265,7 @@ module BBMB
       def postprocess(persistence)
         persistence.all(Model::Customer).each { |customer|
           active = @active_quotas[customer.customer_id] || []
-          persistence.delete(customer.quotas - active)
+          persistence.delete *(customer.quotas - active)
         }
       end
     end
