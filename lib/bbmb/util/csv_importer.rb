@@ -105,8 +105,8 @@ module BBMB
         @active_products = {}
       end
       VAT = {
-        '1' => 2.4,
-        '2' => 7.6,
+        '1' => 2.5,
+        '2' => 8.0,
       }
       PRODUCT_MAP = {
         1   =>  :status,
