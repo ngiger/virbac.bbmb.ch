@@ -232,7 +232,7 @@ Beste Grüsse. Virbac Schweiz AG
       :unavailable0             =>  "Unidentifiziertes Produkt (",
       :unavailable1             =>  ")",
       :version                  =>  "Commit-ID",
-      :welcome                  =>  "Wilkommen bei Virbac",
+      :welcome                  =>  "Willkommen bei Virbac",
       :ywesee                   =>  "ywesee.com",
     },
     "fr"  =>  {
