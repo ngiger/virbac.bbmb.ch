@@ -8,8 +8,6 @@ require 'bbmb/model/product'
 require 'bbmb/model/promotion'
 require 'bbmb/util/mail'
 require 'date'
-require 'encoding/character/utf-8'
-require 'iconv'
 require 'csv'
 
 module BBMB
@@ -37,7 +35,7 @@ module BBMB
       def postprocess(persistence)
       end
       def string(str)
-        str = u(Iconv.new('utf-8', 'latin1').iconv(str.to_s)).strip
+        str.encode('UTF-8')   # str = u(Iconv.new('utf-8', 'latin1').iconv(str.to_s)).strip
         str.gsub(/\s+/, ' ') unless str.empty? 
       end
     end
