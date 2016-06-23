@@ -3,7 +3,7 @@
 
 require 'sbsm/request'
 
-DRb.start_service('druby://localhost:0')
+::DRb.start_service('druby://localhost:0')
 
 begin
 	SBSM::Request.new(ENV["DRB_SERVER"]).process
