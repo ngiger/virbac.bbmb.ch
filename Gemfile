@@ -1,10 +1,8 @@
 source 'https://rubygems.org'
 
 gem 'odba'
-gem 'tmail'
-gem 'xmlconv'
-gem 'minitest'
-gem 'flexmock'
+gem 'bbmb'
+
 group :debugger do
   if RUBY_VERSION.match(/^1/)
     gem 'pry-debugger'
@@ -15,6 +13,8 @@ group :debugger do
 end
 
 group :test do
+  gem 'minitest'
+  gem 'flexmock'
   gem 'rspec'
   gem 'watir'
   gem 'watir-webdriver'

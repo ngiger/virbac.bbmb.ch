@@ -1,30 +1,28 @@
 # sandozxmlconv
 
-* https://github.com/zdavatz/sandoz.xmlconv.bbmb.ch
+* https://github.com/zdavatz/virbac.bbmb.ch
 
-A graphical overview can be found here:
-
-* https://github.com/zdavatz/sandoz.xmlconv.bbmb.ch/sandozxmlconv.jpeg
 
 ## DESCRIPTION:
 
-* xml converter files for Sandoz Switzerland
+* virbac.bbmb.ch
 
 ## REQUIREMENTS:
 
-* xmlconv - sudo gem install xmlconv
+* bbmb - sudo gem install bbmb
 
 ## INSTALL:
 
-* git clone https://github.com/zdavatz/sandoz.xmlconv.bbmb.ch.git
+* git clone https://github.com/zdavatz/virbac.bbmb.ch.git
 * create and adapt etc/polling.yml
-* create and adapt etc/xmlconv.yml
+* create and adapt etc/ydim.yml
+* create and adapt etc/yus.yml
+* create and adapt etc/conf.yml
 * mkdir -p log var/output
 * integrate it with apache mod_ruby
 
 ## Testing
 
-There is one spec test (using watir) to check the injection. To run it call `rspec spec/injection_spec.rb`
 
 ## DEVELOPERS:
 
