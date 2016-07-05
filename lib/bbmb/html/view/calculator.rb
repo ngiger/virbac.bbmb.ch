@@ -92,8 +92,7 @@ class CalculatorComposite < HtmlGrid::DivForm
     model.categories.collect { |cat|
       link = HtmlGrid::Link.new(cat, model, @session, self)
       unless(cat == cur)
-        link.href = @lookandfeel._event_url(:calculator, 
-                                            :category => cat)
+        link.href = @lookandfeel._event_url(:calculator, :category => cat)
       end
       link.value = cat
       link
@@ -102,11 +101,18 @@ class CalculatorComposite < HtmlGrid::DivForm
   def current
     @session.state.current
   end
+
+  def createCalcScript(css_id)
+    %(require(['dojo']);
+    document.getElementsByName('#{EVENT}')[0].click();
+    )
+  end
   def factor(model)
     input = HtmlGrid::InputText.new(:factor, model, @session, self)
     input.value = @session.cookie_set_or_get(:factor) || '1.5'
     input.css_class = 'tiny'
-    input.set_attribute('onChange', 'calc(this.form);')
+    input.css_id = input.name
+    input.set_attribute('onChange', createCalcScript(input.css_id))
     [HtmlGrid::SimpleLabel.new(:factor, input, @session, self), input]
   end
   def products(model)
@@ -114,12 +120,15 @@ class CalculatorComposite < HtmlGrid::DivForm
   end
   def show_vat(model)
     input = HtmlGrid::InputCheckbox.new(:show_vat, model, @session, self)
-    input.set_attribute('onClick', 'calc(this.form);')
+    input.css_id = input.name
+    input.set_attribute('onClick', createCalcScript(input.css_id))
     input.set_attribute('checked', @session.cookie_set_or_get(:show_vat))
     input
   end
   def submit(model)
-    self.onsubmit = 'calc(this); return false;'
+    self.onsubmit = %(this.setAttribute('method', 'POST');
+    this.setAttribute('action',  window.location.href);
+    return true;)
     super
   end
 end
@@ -127,7 +136,7 @@ class Calculator < Template
   include HtmlGrid::DojoToolkit::DojoTemplate
   CONTENT = CalculatorComposite
   DOJO_DEBUG = BBMB.config.debug
-  JAVASCRIPTS = ['calculator']
+  JAVASCRIPTS = []
 end
     end
   end
