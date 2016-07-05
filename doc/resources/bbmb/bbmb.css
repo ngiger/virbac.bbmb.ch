@@ -249,6 +249,18 @@ td.login-foot {
   padding-top: 30px;
   vertical-align: top;
 }
+td.login-foot.box {
+    background: grey;
+    color: #FFF;
+    border-radius: 4px;
+    color: #FFF;
+    padding: 10px;
+    margin: 5px 0;
+    width: auto;
+}
+td.hidden {
+  height: 0
+}
 td.new-customer a {
 	color: #039;
 	background-color: #FFFFFF;
