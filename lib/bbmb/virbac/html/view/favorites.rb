@@ -44,7 +44,7 @@ class FavoritesPositions
   }
 end
 class Favorites
-  DOJO_REQUIRE.push('dojo.widget.Tooltip')
+  DOJO_REQUIRE.push( 'dijit/Tooltip' )
 end
     end
   end

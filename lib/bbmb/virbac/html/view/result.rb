@@ -47,7 +47,7 @@ class Products
 end
 class Result
   include HtmlGrid::DojoToolkit::DojoTemplate
-  DOJO_REQUIRE = [ 'dojo.widget.*', 'dojo.widget.Tooltip' ]
+  DOJO_REQUIRE = [ 'dijit/Tooltip' ]
 end
     end
   end

@@ -70,7 +70,7 @@ class CurrentOrderForm
   end
 end
 class CurrentOrder
-  DOJO_REQUIRE.push('dojo.widget.Tooltip')
+  DOJO_REQUIRE = ['dojo/parser', 'dijit/Tooltip']
 end
     end
   end

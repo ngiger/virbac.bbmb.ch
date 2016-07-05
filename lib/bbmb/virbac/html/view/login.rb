@@ -1,12 +1,13 @@
 #!/usr/bin/env ruby
 # Html::View::Login -- virbac.bbmb.ch -- 19.07.2007 -- hwyss@ywesee.com
 
+require 'cgi'
 module BBMB
   module Html
     module View
 class NewCustomerForm < HtmlGrid::Form
   include HtmlGrid::ErrorMessage
-  COMPONENTS = { 
+  COMPONENTS = {
     [0,0] => :firstname,
     [0,1] => :lastname,
     [0,2] => :organisation,
@@ -27,6 +28,7 @@ class NewCustomerForm < HtmlGrid::Form
   }
   def init
     super
+    set_attribute('hidden', (@session.event == :request_access) ? 'true' : 'false')
     error_message
   end
 end
@@ -35,13 +37,12 @@ class LoginForm < HtmlGrid::Form
     [0,0] =>  :email,
     [0,1] =>  :pass,
     [1,2] =>  :submit,
-    [0,3,0] =>  :delivery_conditions,
-    [0,3,1] =>  :delivery_conditions_text,
-    [0,4,0] =>  :business_conditions,
-    [0,4,1] =>  :business_conditions_text,
+    [0,3] =>  :delivery_conditions,
+    [0,4] =>  :business_conditions,
     [0,5] =>  :new_customer,
+    [1,5] =>  :new_customer_invite,
   }
-  CSS_MAP = { 
+  CSS_MAP = {
     [0,3,2]   => 'login-foot',
     [0,4,1,2] => 'top',
   }
@@ -49,48 +50,49 @@ class LoginForm < HtmlGrid::Form
     [0,3] => 2,
     [0,4] => 2,
   }
+
   def business_conditions(model)
-    conditions('business')
+    content_toggler(model, 'business_conditions')
   end
-  def business_conditions_text(model)
-    conditions_text('business', model)
-  end
-  def conditions(key)
-    msg = @lookandfeel.lookup("#{key}_conditions")
-    attrs = {
-      'css_class'     => 'login-foot',
-      'message_open'  => msg, 
-      'message_close' => msg, 
-      'status'        => 'closed',
-      'togglee'       => "#{key}-conditions",
-    }
-    dojo_tag('contenttoggler', attrs)
-  end
-  def conditions_text(key, model)
+  def content_toggler(model, key, status=false)
+    togglee = "#{key}_text"
+    link = HtmlGrid::Link.new("#{key}", model, @session, self)
+    link.css_id = key
+    link.value = @lookandfeel.lookup(key)
     div = HtmlGrid::Div.new(model, @session, self)
-    div.value = @lookandfeel.lookup("#{key}_conditions_text")
-    div.css_id = "#{key}-conditions"
-    div
+    div.css_id = togglee
+    div.set_attribute('hidden', status ? 'true' : 'false')
+    div.value = @lookandfeel.lookup(togglee)
+    script = "event.preventDefault();
+var element = document.getElementById('#{togglee}');
+// console.log('onclick: #{togglee} hidden '+ document.getElementById('#{togglee}').hidden);
+element.hidden = !element.hidden;
+"
+    link.set_attribute("onclick", script)
+    [link, div]
   end
+
   def delivery_conditions(model)
-    conditions('delivery')
+    return content_toggler(model, 'delivery_conditions')
   end
-  def delivery_conditions_text(model)
-    conditions_text('delivery', model)
-  end
+
   def new_customer(model)
-    msg = @lookandfeel.lookup(:new_customer_invite).gsub("\n", '<br>')
-    status = (@session.event == :request_access) ? 'open' : 'closed'
-    attrs = {
-      'css_class'     => 'new-customer',
-      'message_open'  => msg, 
-      'message_close' => msg, 
-      'status'        => status,
-      'togglee'       => 'new-customer',
-    }
-    tag = dojo_tag('contenttoggler', attrs)
-    tag.label = true
-    tag
+    HtmlGrid::LabelText.new(:new_customer, model, @session, self)
+  end
+  def new_customer_invite(model)
+    togglee = 'new-customer-form'
+    link = HtmlGrid::Link.new(:new_customer_invite, model, @session, self)
+    script = "
+var element = document.getElementById('#{togglee}');
+// console.log('new_customer_invite onclick second2: #{togglee} hidden '+ element.hidden);
+if (document.getElementById('#{togglee}').hidden) {
+  document.getElementById('#{togglee}').hidden = false;
+} else {
+  document.getElementById('#{togglee}').hidden = true;
+}
+"
+    link.set_attribute("onclick", script)
+    link
   end
 end
 class LoginComposite < HtmlGrid::DivComposite
@@ -101,13 +103,9 @@ class LoginComposite < HtmlGrid::DivComposite
   CSS_ID_MAP = { 1 => 'new-customer' }
 end
 class Login < Template
-  include HtmlGrid::DojoToolkit::DojoTemplate
-  DOJO_DEBUG = BBMB.config.debug
-  DOJO_PREFIX = {
-    'ywesee' => '../javascript',
-  }
-  DOJO_REQUIRE = [ 'dojo.widget.*', 'ywesee.widget.*', 
-    'ywesee.widget.ContentToggler' ]
+  # we want to disable dojo completely
+  DOJO_PREFIX = {}
+  DOJO_REQUIRE = []
 end
     end
   end
