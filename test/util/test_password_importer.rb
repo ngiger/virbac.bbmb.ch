@@ -4,13 +4,14 @@
 
 $: << File.expand_path('../../lib', File.dirname(__FILE__))
 
-require 'test/unit'
-require 'bbmb/util/password_importer'
+require "minitest/autorun"
+require 'flexmock/test_unit'
 require 'flexmock'
+require 'bbmb/util/password_importer'
 
 module BBMB
   module Util
-    class TestPasswortImporter < Test::Unit::TestCase
+    class TestPasswortImporter < Minitest::Test
       include FlexMock::TestCase
       def setup
         @password = flexmock('cell')

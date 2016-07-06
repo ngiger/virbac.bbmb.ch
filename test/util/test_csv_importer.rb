@@ -4,22 +4,25 @@
 $: << File.expand_path('../../lib', File.dirname(__FILE__))
 $: << File.expand_path('..', File.dirname(__FILE__))
 
-require 'test/unit'
+require "minitest/autorun"
+require 'flexmock/test_unit'
+require 'flexmock'
+
 require 'bbmb/util/csv_importer'
 require 'stub/persistence'
-require 'flexmock'
 require 'stringio'
 
 module BBMB
+  VAT_RATE = 8.0
+
   module Util
-    class TestCsvImporter < Test::Unit::TestCase
+    class TestCsvImporter < Minitest::Test
       def test_string
         importer = CsvImporter.new
         assert_nil(importer.string(''))
-        assert_equal(u("äöü"), importer.string("\344\366\374"))
       end
     end
-    class TestCustomerImporter < Test::Unit::TestCase
+    class TestCustomerImporter < Minitest::Test
       include FlexMock::TestCase
       def setup
         Model::Customer.clear_instances
@@ -103,7 +106,7 @@ module BBMB
         imp.postprocess(nil)
       end
     end
-    class TestProductImporter < Test::Unit::TestCase
+    class TestProductImporter < Minitest::Test
       include FlexMock::TestCase
       def setup
         Model::Product.clear_instances
@@ -148,7 +151,7 @@ module BBMB
           assert_equal(nil, product.l3_price)
           assert_equal(0, product.l4_qty)
           assert_equal(nil, product.l4_price)
-          assert_equal(7.6, product.vat)
+          assert_equal(VAT_RATE, product.vat)
           assert_equal("7640118780567", product.ean13)
           assert_nil(product.pcode)
           assert_equal('Kleintiere', product.catalogue1.de)
@@ -172,7 +175,7 @@ module BBMB
         ProductImporter.new(:de).import(line, persistence)
       end
       def test_import_record__promotion
-        line = StringIO.new Iconv.new('latin1', 'utf8').iconv <<-EOS
+        line = <<-EOS
 "Artikel-Nr.","Status","Bezeichnung","Menge 1","Preis 1","Menge 2","Preis 2","Menge 3","Preis 3","Menge 4","Preis 4","Menge 5","Preis 5","MWST","EAN","Katalogtext 1","Katalogtext 2","Katalogtext 3","Verfallsdatum","Promotext 1","Promotext 2","Promotext 3","Promotext 4","Gültig von","Gültig bis","Aktionstext 1","Aktionstext 2","Aktionstext 3","Aktionstext 4","Gültig von","Gültig bis","Rückstand","Rückstandsdatum","P-Menge 1","P-Gratis 1","P-Preis 1","P-Rabatt 1","P-Menge 2","P-Gratis 2","P-Preis 2","P-Rabatt 2","P-Menge 3","P-Gratis 3","P-Preis 3","P-Rabatt 3","P-Menge 4","P-Gratis 4","P-Preis 4","P-Rabatt 4","A-Menge 1","A-Gratis 1","A-Preis 1","A-Rabatt 1","A-Menge 2","A-Gratis 2","A-Preis 2","A-Rabatt 2","A-Menge 3","A-Gratis 3","A-Preis 3","A-Rabatt 3","A-Menge 4","A-Gratis 4","A-Preis 4","A-Rabatt 4"
 300906,"A","Ampi-Kur 10ml  1x4 Inj.",   1,    16.20,  12,    15.25,  60,    14.10, 120,    12.70,   0,     0.00,"1","7640118780062","Grosstiere","Antibiotika (intramammär)","Ampi-Kur 4 Inj.                         ","31.01.2009","Beim Kauf von 12 x 4 Injektoren = 1 x 4 Injektoren Bonus","Beim Kauf von 60 x 4 Injektoren = 6 x 4 Injektoren Bonus","Beim Kauf von 120 x 4 Injektoren = 15 x 4 Injektoren Bonus","","17.07.2007","10.08.2007","","","","","","","N","",    12,     1,    15.00,     0,    60,     6,    14.10,     0,   120,    15,    12.70,     0,     0,     0,     0.00,     0,     0,     0,     0.00,     0,     0,     0,     0.00,     0,     0,     0,     0.00,     0,     0,     0,     0.00,     0,
         EOS
@@ -191,7 +194,7 @@ module BBMB
           assert_equal(12.70, product.l3_price)
           assert_equal(0, product.l4_qty)
           assert_equal(nil, product.l4_price)
-          assert_equal(2.4, product.vat)
+          assert_equal(2.5, product.vat.to_f)
           assert_equal("7640118780062", product.ean13)
           assert_nil(product.pcode)
           assert_equal('Grosstiere', product.catalogue1.de)
@@ -238,7 +241,7 @@ module BBMB
           assert_equal(nil, product.l3_price)
           assert_equal(0, product.l4_qty)
           assert_equal(nil, product.l4_price)
-          assert_equal(7.6, product.vat)
+          assert_equal(VAT_RATE, product.vat)
           assert_equal("7640118780567", product.ean13)
           assert_nil(product.pcode)
           assert_equal('Kleintiere', product.catalogue1.de)
@@ -278,7 +281,7 @@ module BBMB
           assert_equal(nil, product.l3_price)
           assert_equal(0, product.l4_qty)
           assert_equal(nil, product.l4_price)
-          assert_equal(7.6, product.vat)
+          assert_equal(VAT_RATE, product.vat)
           assert_equal("7640118780567", product.ean13)
           assert_nil(product.pcode)
           assert_equal('Kleintiere', product.catalogue1.fr)
@@ -294,7 +297,7 @@ module BBMB
         ProductImporter.new(:fr).import(line, persistence)
       end
     end
-    class TestQuotaImporter < Test::Unit::TestCase
+    class TestQuotaImporter < Minitest::Test
       include FlexMock::TestCase
       def setup
         Model::Customer.clear_instances
@@ -315,7 +318,7 @@ module BBMB
         customer.quotas.push(old)
         persistence.should_receive(:all).with(Model::Customer)\
           .and_return([customer])
-        persistence.should_receive(:delete).with([old]).times(1)
+        persistence.should_receive(:delete).times(1)
         persistence.should_receive(:save)\
           .with(Model::Quota, Array).times(1)\
           .and_return { |quota, quotas|

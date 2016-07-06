@@ -4,15 +4,15 @@
 $: << File.expand_path('..', File.dirname(__FILE__))
 $: << File.expand_path('../../lib', File.dirname(__FILE__))
 
-require 'test/unit'
+require "minitest/autorun"
+require 'flexmock/test_unit'
 require 'bbmb/util/updater'
 require 'bbmb/util/csv_importer'
 require 'stub/persistence'
-require 'flexmock'
 
 module BBMB
   module Util
-    class TestUpdater < Test::Unit::TestCase
+    class TestUpdater < Minitest::Test
       include FlexMock::TestCase
       def setup
         BBMB.config = config = flexmock('Config')

@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'odba'
 gem 'bbmb'
+gem 'spreadsheet'
 
 group :debugger do
   if RUBY_VERSION.match(/^1/)
@@ -13,6 +14,7 @@ group :debugger do
 end
 
 group :test do
+  gem 'test-unit'
   gem 'minitest'
   gem 'flexmock'
   gem 'rspec'

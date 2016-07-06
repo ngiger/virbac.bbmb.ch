@@ -4,7 +4,7 @@
 require 'bbmb/model/customer'
 require 'bbmb/config'
 require 'digest/md5'
-require 'parseexcel'
+require 'spreadsheet'
 
 module BBMB
   module Util
@@ -14,7 +14,7 @@ module BBMB
       end
       def import(io, persistence=BBMB.persistence)
         count = 0
-        workbook = Spreadsheet::ParseExcel.parse(io)
+        workbook = Spreadsheet.open(io)
         workbook.worksheet(0).each(1) { |row| 
           import_record(row) && count += 1
         }

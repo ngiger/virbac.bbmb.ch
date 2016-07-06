@@ -18,7 +18,8 @@ module BBMB
       end
       def import(io, persistence=BBMB.persistence)
         count = 0
-        CSV::IOReader.new(io, ',').each_with_index { |record, idx|
+        csv = CSV.new(io)
+        csv.each_with_index { |record, idx|
           count += 1
           next if(count <= @skip)
           if(objects = import_record(record))
@@ -35,8 +36,8 @@ module BBMB
       def postprocess(persistence)
       end
       def string(str)
-        str.encode('UTF-8')   # str = u(Iconv.new('utf-8', 'latin1').iconv(str.to_s)).strip
-        str.gsub(/\s+/, ' ') unless str.empty? 
+        str.encode('UTF-8', {invalid: :replace, undef: :replace, replace: ''}) if str
+        str.gsub(/\s+/, ' ').sub(/\s+$/, '') if str && !str.empty?
       end
     end
     class CustomerImporter < CsvImporter
