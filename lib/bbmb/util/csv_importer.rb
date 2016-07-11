@@ -13,20 +13,26 @@ require 'csv'
 module BBMB
   module Util
     class CsvImporter 
+      include DRb::DRbUndumped
       def initialize
         @skip = 1
       end
       def import(io, persistence=BBMB.persistence)
+        puts  "#{File.basename(__FILE__)}: importing #{io.to_path}"
         count = 0
-        csv = CSV.new(io)
-        csv.each_with_index { |record, idx|
+        return 0 unless /KUNDEN/i.match(io.to_path)
+        csv = CSV.new(File.read(io.to_path).encode('UTF-8', {invalid: :replace, undef: :replace, replace: ''}))
+        csv.each_with_index do |record, idx|
           count += 1
           next if(count <= @skip)
+          STDOUT.write "." if(count % 100 == 0)
+          puts " #{count}\n" if(count % 1000 == 0)
           if(objects = import_record(record))
             persistence.save(*objects)
           end
-        }
+        end
         postprocess(persistence)
+        puts  "#{File.basename(__FILE__)}: finished. #{io.to_path}. count is #{count}"
         count
       end
       def date(str)

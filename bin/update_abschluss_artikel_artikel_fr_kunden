@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+
+$: << File.expand_path('../lib', File.dirname(__FILE__))
+
+require 'drb'
+require 'logger'
+require 'ydim/invoice'
+require 'bbmb/config'
+require 'bbmb/util/server'
+require 'mail'
+
+module BBMB
+  @config.load_files.each { |local|
+    require local
+  }
+  require File.join('bbmb', 'persistence', @config.persistence)
+  case @config.persistence
+  when 'odba'
+    DRb.install_id_conv ODBA::DRbIdConv.new
+    @persistence = BBMB::Persistence::ODBA
+  end
+
+  log_file = '/tmp/' + File.basename(__FILE__)+ '.log'
+  puts log_file
+  FileUtils.mkdir_p(File.dirname(log_file))
+  log_file = File.open(log_file, 'a')
+  log_file.sync= true
+  at_exit { log_file.close }
+  @logger = Logger.new(log_file)
+  puts "#{@logger.inspect}"
+  @logger.level = Logger.const_get(@config.log_level)
+  @logger.debug('config') { @config.pretty_inspect }
+  auth_domain = BBMB.config.auth_domain
+  @auth = DRb::DRbObject.new(nil, @config.auth_url)
+  bbmb = DRbObject.new(nil, BBMB.config.server_url)
+
+  begin
+    @server = BBMB::Util::Server.new(@persistence)
+    @server.extend(DRbUndumped)
+    puts "#{Time.now}: Calling update"
+    @server.update
+    puts "#{Time.now}: Finished update"
+  rescue Exception => error
+    @logger.error('fatal') { error }
+    raise
+  end
+end
