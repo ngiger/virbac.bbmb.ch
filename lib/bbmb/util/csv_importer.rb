@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: ASCII-8BIT
 # Util::CsvImporter -- de.oddb.org -- 10.04.2007 -- hwyss@ywesee.com
 
 require 'bbmb'
@@ -18,15 +19,17 @@ module BBMB
         @skip = 1
       end
       def import(io, persistence=BBMB.persistence)
-        puts  "#{File.basename(__FILE__)}: importing #{io.to_path}"
         count = 0
-        return 0 unless /KUNDEN/i.match(io.to_path)
-        csv = CSV.new(File.read(io.to_path).encode('UTF-8', {invalid: :replace, undef: :replace, replace: ''}))
+        csv = CSV.new(File.read(io.to_path, :encoding => 'iso-8859-1').encode('UTF-8'))
+        puts  "#{File.basename(__FILE__)}: importing #{io.to_path} #{csv.count} lines"
+        csv = CSV.new(File.read(io.to_path, :encoding => 'iso-8859-1').encode('UTF-8'))
         csv.each_with_index do |record, idx|
           count += 1
           next if(count <= @skip)
           STDOUT.write "." if(count % 100 == 0)
           puts " #{count}\n" if(count % 1000 == 0)
+          next unless record.size >= CustomerImporter::CUSTOMER_MAP.size
+          puts "import_record #{count}: #{record}. size #{record.size} #{record.class}" if $VERBOSE
           if(objects = import_record(record))
             persistence.save(*objects)
           end
@@ -69,8 +72,10 @@ module BBMB
       def import_record(record)
         customer_id = string(record[0])
         return unless(/^\d+$/.match(customer_id))
+        # require 'pry'; binding.pry if /bdbutty@bluewin.ch/.match(record[7])
         active = string(record[1]) == 'A'
-        customer = Model::Customer.find_by_customer_id(customer_id)
+        customer   = Model::Customer.find_by_customer_id(customer_id)
+        customer ||= Model::Customer.odba_extent.find_all{|x| /#{record[7]}/.match(x.email) && x.status.eql?(:active)}.first if active
         if(customer.nil? && active)
           customer = Model::Customer.new(customer_id)
         end
@@ -90,8 +95,12 @@ module BBMB
           }
         end
         customer
-      rescue Yus::DuplicateNameError => err
-        @duplicates.push(err)
+      rescue => err
+        if /DuplicateNameError|Duplicate name/.match(err.to_s)
+          @duplicates.push(err)
+        else
+          raise(err.to_s)
+        end
         nil
       end
       def postprocess(persistence)
@@ -100,6 +109,7 @@ module BBMB
           err = @duplicates.shift
           @duplicates.each { |other| err.message << "\n" << other.message }
           Util::Mail.notify_error(err)
+          puts "Util::Mail.notify_err: #{@duplicates.size} @duplicates done"
         end
       end
     end
@@ -246,11 +256,14 @@ module BBMB
         @active_quotas = {}
       end
       def import_record(record)
+        puts "QuotaImporter #{record}"
         customer_id = string(record[0])
         return unless(/^\d+$/.match(customer_id))
         art_id = string(record[3])
-        if((custmr = Model::Customer.find_by_customer_id(customer_id)) \
+        if (art_id  \
+           && (custmr = Model::Customer.find_by_customer_id(customer_id)) \
            && (product = Model::Product.find_by_article_number(art_id)))
+          return unless custmr && product
           quota = custmr.quota(art_id)
           if(quota.nil?)
             quota = custmr.add_quota(Model::Quota.new(product))
@@ -270,7 +283,7 @@ module BBMB
       def postprocess(persistence)
         persistence.all(Model::Customer).each { |customer|
           active = @active_quotas[customer.customer_id] || []
-          persistence.delete *(customer.quotas - active)
+          persistence.delete *(customer.quotas.compact - active)
         }
       end
     end
