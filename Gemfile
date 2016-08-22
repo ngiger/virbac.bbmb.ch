@@ -17,6 +17,7 @@ group :test do
   gem 'test-unit'
   gem 'minitest'
   gem 'flexmock'
+  gem 'rake'
   gem 'rspec'
   gem 'watir'
   gem 'watir-webdriver'
