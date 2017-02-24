@@ -20,9 +20,14 @@ module BBMB
       end
       def import(io, persistence=BBMB.persistence)
         count = 0
-        csv = CSV.new(File.read(io.to_path, :encoding => 'iso-8859-1').encode('UTF-8'))
-        puts  "#{File.basename(__FILE__)}: importing #{io.to_path} #{csv.count} lines"
-        csv = CSV.new(File.read(io.to_path, :encoding => 'iso-8859-1').encode('UTF-8'))
+        encoding = File.read(io.to_path).encoding
+        if encoding.to_s.eql?('UTF-8')
+          csv = CSV.new(File.read(io.to_path))
+        else
+          csv = CSV.new(File.read(io.to_path, :encoding => encoding).encode('UTF-8'))
+        end
+        puts  "#{File.basename(__FILE__)}: #{encoding} importing #{io.to_path} #{csv.count} lines"
+        csv.rewind
         csv.each_with_index do |record, idx|
           count += 1
           next if(count <= @skip)
@@ -256,7 +261,6 @@ module BBMB
         @active_quotas = {}
       end
       def import_record(record)
-        puts "QuotaImporter #{record}"
         customer_id = string(record[0])
         return unless(/^\d+$/.match(customer_id))
         art_id = string(record[3])
