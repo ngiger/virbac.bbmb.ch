@@ -11,6 +11,7 @@ require 'bbmb/util/csv_importer'
 require 'stub/persistence'
 
 module BBMB
+
   module Util
     class TestUpdater < Minitest::Test
       include FlexMock::TestCase
@@ -23,12 +24,15 @@ module BBMB
           'KUNDEN.CSV'    => 'CustomerImporter',
         }
         config.should_receive(:importers).and_return(importers)
+        if defined?(BBMB.logger)
+          BBMB.logger = flexmock("logger")
+          BBMB.logger.should_receive(:info)
+          BBMB.logger.should_receive(:debug)
+        end
       end
       def test_import_customers
-        BBMB.logger = flexmock("logger")
-        BBMB.logger.should_ignore_missing
         persistence = flexmock("persistence")
-        flexstub(CustomerImporter).should_receive(:new).times(1).and_return { 
+        flexstub(CustomerImporter).should_receive(:new).times(1).and_return {
           importer = flexmock('importer')
           importer.should_receive(:import).times(1).and_return { |io|
             assert_equal('data', io)
@@ -38,10 +42,8 @@ module BBMB
         Updater.import("CustomerImporter", [], "data")
       end
       def test_import_products
-        BBMB.logger = flexmock("logger")
-        BBMB.logger.should_ignore_missing
         persistence = flexmock("persistence")
-        flexstub(ProductImporter).should_receive(:new).times(1).and_return { 
+        flexstub(ProductImporter).should_receive(:new).times(1).and_return {
           importer = flexmock('importer')
           importer.should_receive(:import).times(1).and_return { |io|
             assert_equal('data', io)
@@ -51,10 +53,8 @@ module BBMB
         Updater.import("ProductImporter", [], "data")
       end
       def test_import_quotas
-        BBMB.logger = flexmock("logger")
-        BBMB.logger.should_ignore_missing
-        persistence = flexmock("persistence")
-        flexstub(QuotaImporter).should_receive(:new).times(1).and_return { 
+         persistence = flexmock("persistence")
+        flexstub(QuotaImporter).should_receive(:new).times(1).and_return {
           importer = flexmock('importer')
           importer.should_receive(:import).times(1).and_return { |io|
             assert_equal('data', io)
@@ -64,13 +64,13 @@ module BBMB
         Updater.import("QuotaImporter", [], "data")
       end
       def test_run__customers
-        flexstub(Updater).should_receive(:import).times(1).and_return { 
+        flexstub(Updater).should_receive(:import).times(1).and_return {
           |importer, args, data|
           assert_equal("CustomerImporter", importer)
           assert_equal([], args)
           assert_equal("mockdata", data)
         }
-        flexstub(PollingManager).should_receive(:new).and_return { 
+        flexstub(PollingManager).should_receive(:new).and_return {
           mgr = flexmock("PollingManager")
           mgr.should_receive(:poll_sources).and_return { |block|
             block.call("KUNDEN.CSV", "mockdata")
@@ -80,13 +80,13 @@ module BBMB
         Updater.run
       end
       def test_run__products
-        flexstub(Updater).should_receive(:import).times(1).and_return { 
+        flexstub(Updater).should_receive(:import).times(1).and_return {
           |importer, args, data|
           assert_equal("ProductImporter", importer)
           assert_equal([:de], args)
           assert_equal("mockdata", data)
         }
-        flexstub(PollingManager).should_receive(:new).and_return { 
+        flexstub(PollingManager).should_receive(:new).and_return {
           mgr = flexmock("PollingManager")
           mgr.should_receive(:poll_sources).and_return { |block|
             block.call("ARTIKEL.CSV", "mockdata")
@@ -96,13 +96,13 @@ module BBMB
         Updater.run
       end
       def test_run__products_fr
-        flexstub(Updater).should_receive(:import).times(1).and_return { 
+        flexstub(Updater).should_receive(:import).times(1).and_return {
           |importer, args, data|
           assert_equal("ProductImporter", importer)
           assert_equal([:fr], args)
           assert_equal("mockdata", data)
         }
-        flexstub(PollingManager).should_receive(:new).and_return { 
+        flexstub(PollingManager).should_receive(:new).and_return {
           mgr = flexmock("PollingManager")
           mgr.should_receive(:poll_sources).and_return { |block|
             block.call("ARTIKEL_FR.CSV", "mockdata")
@@ -112,13 +112,13 @@ module BBMB
         Updater.run
       end
       def test_run__quotas
-        flexstub(Updater).should_receive(:import).times(1).and_return { 
+        flexstub(Updater).should_receive(:import).times(1).and_return {
           |importer, args, data|
           assert_equal("QuotaImporter", importer)
           assert_equal([], args)
           assert_equal("mockdata", data)
         }
-        flexstub(PollingManager).should_receive(:new).and_return { 
+        flexstub(PollingManager).should_receive(:new).and_return {
           mgr = flexmock("PollingManager")
           mgr.should_receive(:poll_sources).and_return { |block|
             block.call("ABSCHLUSS.CSV", "mockdata")

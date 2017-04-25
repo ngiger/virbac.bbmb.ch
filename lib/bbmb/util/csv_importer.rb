@@ -97,7 +97,7 @@ module BBMB
         return unless(/^\d+$/.match(customer_id))
         active = string(record[1]) == 'A'
         customer   = Model::Customer.find_by_customer_id(customer_id)
-        customer ||= Model::Customer.odba_extent.find_all{|x| /#{record[7]}/.match(x.email) && x.status.eql?(:active)}.first if active
+        customer ||= Model::Customer.odba_extent.find_all{|x| /#{record[7]}/.match(x.email) && x.status.eql?(:active)}.first if active && defined?(Model::Customer.odba_extent)
         if(customer.nil? && active)
           customer = Model::Customer.new(customer_id)
         end
@@ -201,7 +201,12 @@ module BBMB
         @active_products.store article_number, true
         product = Model::Product.find_by_article_number(article_number) \
           || Model::Product.new(article_number)
-        PRODUCT_MAP.each { |idx, name|
+        unless product.is_a?(Model::Product)
+          puts "Could not find a product #{article_number}, it is a #{product.class} with odba_id #{product.odba_id}. Skipping"
+          puts "   #{record}"
+          return nil
+        end
+        PRODUCT_MAP.each do |idx, name|
           value = string(record[idx])
           writer = "#{name}="
           case name
@@ -214,9 +219,13 @@ module BBMB
           when :status
             product.send(writer, (value == 'A') ? :active : :inactive)
           else
-            product.send(writer, value)
+            begin
+              product.send(writer, value)
+            rescue => error
+              puts "#{error}: Unable to change #{name} from '#{product.send("#{name}")}' to '#{value}' for #{record}."
+            end
           end
-        }
+        end
         product.promotion = import_promotion(product.promotion, record, 19, 33)
         product.sale = import_promotion(product.sale, record, 25, 49)
         product
