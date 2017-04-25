@@ -10,23 +10,41 @@ require 'bbmb/model/promotion'
 require 'bbmb/util/mail'
 require 'date'
 require 'csv'
+require 'drb'
+module BBMB
+  module Model
+    class Customer
+      puts "TODO: Remove monkey patching bbmb because of missing customer 3219 as of 2017.04.25"
+      def quota(article_id)
+        @quotas.compact.find { |quota| puts "Unexpected class for article_id #{article_id} odba_id #{odba_id} #{quota.class} in #{self}" unless quota.is_a?(BBMB::Model::Quota) ; quota.is_a?(BBMB::Model::Quota) && quota.article_number == article_id }
+      end
+    end
+ end
+end
 
 module BBMB
   module Util
-    class CsvImporter 
+    class CsvImporter
       include DRb::DRbUndumped
       def initialize
         @skip = 1
       end
       def import(io, persistence=BBMB.persistence)
         count = 0
-        encoding = File.read(io.to_path).encoding
-        if encoding.to_s.eql?('UTF-8')
-          csv = CSV.new(File.read(io.to_path))
+        if io.is_a?(StringIO)
+          puts  "#{File.basename(__FILE__)}:  importing string"
+          io_path = 'String'
+          csv = CSV.new(io)
         else
-          csv = CSV.new(File.read(io.to_path, :encoding => encoding).encode('UTF-8'))
+          io_path = io.to_path
+          encoding = File.read(io_path).encoding
+          if encoding.to_s.eql?('UTF-8')
+            csv = CSV.new(File.read(io_path))
+          else
+            csv = CSV.new(File.read(io_path, :encoding => encoding).encode('UTF-8'))
+          end
+          puts  "#{File.basename(__FILE__)}: #{encoding} importing #{io_path} #{csv.count} lines"
         end
-        puts  "#{File.basename(__FILE__)}: #{encoding} importing #{io.to_path} #{csv.count} lines"
         csv.rewind
         csv.each_with_index do |record, idx|
           count += 1
@@ -40,7 +58,7 @@ module BBMB
           end
         end
         postprocess(persistence)
-        puts  "#{File.basename(__FILE__)}: finished. #{io.to_path}. count is #{count}"
+        puts  "#{File.basename(__FILE__)}: finished. #{io_path}. count is #{count}"
         count
       end
       def date(str)
@@ -65,7 +83,7 @@ module BBMB
         7   =>  :email,
         8   =>  :language,
         9   =>  :canton,
-      }  
+      }
       LANGUAGES = {
         'd' => 'de',
         'f' => 'fr',
@@ -77,7 +95,6 @@ module BBMB
       def import_record(record)
         customer_id = string(record[0])
         return unless(/^\d+$/.match(customer_id))
-        # require 'pry'; binding.pry if /bdbutty@bluewin.ch/.match(record[7])
         active = string(record[1]) == 'A'
         customer   = Model::Customer.find_by_customer_id(customer_id)
         customer ||= Model::Customer.odba_extent.find_all{|x| /#{record[7]}/.match(x.email) && x.status.eql?(:active)}.first if active
@@ -104,6 +121,7 @@ module BBMB
         if /DuplicateNameError|Duplicate name/.match(err.to_s)
           @duplicates.push(err)
         else
+          puts err.backtrace.join("\n")
           raise(err.to_s)
         end
         nil
@@ -248,11 +266,11 @@ module BBMB
     end
     class QuotaImporter < CsvImporter
       QUOTA_MAP = {
-        5  => :start_date, 
-        6  => :end_date, 
+        5  => :start_date,
+        6  => :end_date,
         7  => :target,
-        8  => :actual, 
-        9  => :difference, 
+        8  => :actual,
+        9  => :difference,
         10 => :price,
       }
       def initialize
@@ -268,6 +286,12 @@ module BBMB
            && (custmr = Model::Customer.find_by_customer_id(customer_id)) \
            && (product = Model::Product.find_by_article_number(art_id)))
           return unless custmr && product
+          unless custmr.is_a?(Model::Customer)
+            puts "Could not find a customer_id #{customer_id}, it is a #{custmr.class} with odba_id #{custmr.odba_id}. Skipping"
+            puts "   #{record}"
+            return []
+          end
+          puts "Importing Quota for art_id #{art_id}" if $VERBOSE
           quota = custmr.quota(art_id)
           if(quota.nil?)
             quota = custmr.add_quota(Model::Quota.new(product))
