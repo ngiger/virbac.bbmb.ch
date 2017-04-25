@@ -102,7 +102,12 @@ module BBMB
           customer = Model::Customer.new(customer_id)
         end
         if(customer)
-          CUSTOMER_MAP.each { |idx, name|
+          unless customer.is_a?(Model::Customer)
+            puts "Unable to fix customer_id #{customer_id} which is a #{customer.class} with odba_id #{customer.odba_id}"
+            puts "  values: #{record}"
+            return
+          end
+          CUSTOMER_MAP.each do |idx, name|
             unless customer.protects? name
               value = string(record[idx])
               case name
@@ -111,10 +116,14 @@ module BBMB
               when :language
                 customer.language = LANGUAGES.fetch(value, 'de')
               else
-                customer.send("#{name}=", value)
+                begin
+                  customer.send("#{name}=", value)
+                rescue => error
+                  puts "#{error}: Unable to change #{name} from '#{customer.send("#{name}")}' to '#{value}' for #{record}."
+                end
               end
             end
-          }
+          end
         end
         customer
       rescue => err
