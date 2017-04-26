@@ -130,8 +130,9 @@ module BBMB
         persistence.should_receive(:all)
         ProductImporter.new(:de).import(src, persistence)
       end
-      def test_import_record
-        existing = Model::Product.new("300354")
+      def test_import_product_record
+        existing = flexmock('existing', Model::Product.new("300354"))
+        existing.should_receive(:odba_id).and_return('odba_id')
         line = StringIO.new <<-EOS
 "Artikel-Nr.","Status","Bezeichnung","Menge 1","Preis 1","Menge 2","Preis 2","Menge 3","Preis 3","Menge 4","Preis 4","Menge 5","Preis 5","MWST","EAN","Katalogtext 1","Katalogtext 2","Katalogtext 3","Verfallsdatum","Promotext 1","Promotext 2","Promotext 3","Promotext 4","Gültig von","Gültig bis","Aktionstext 1","Aktionstext 2","Aktionstext 3","Aktionstext 4","Gültig von","Gültig bis","Rückstand","Rückstandsdatum"
 300355,"A","Sebomild P Lotion 250ml",   1,    12.75,  12,    12.00,  36,    11.20,   0,     0.00,   0,     0.00,"2","7640118780567","Kleintiere","Dermatologika","Sebomild P Lotion                       ","31.03.2008","","","","","","","","","","","","","Y","30.04.2007"
@@ -316,6 +317,7 @@ module BBMB
         persistence = flexmock("persistence")
         old = flexmock('quota')
         old.should_receive(:article_number).and_return('300725')
+        old.should_receive(:odba_id).and_return('odba_id')
         customer.quotas.push(old)
         persistence.should_receive(:all).with(Model::Customer)\
           .and_return([customer])

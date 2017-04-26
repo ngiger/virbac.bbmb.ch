@@ -16,11 +16,20 @@ module BBMB
     class Customer
       puts "TODO: Remove monkey patching bbmb because of missing customer 3219 as of 2017.04.25"
       def quota(article_id)
-        @quotas.compact.find { |quota| puts "Unexpected class for article_id #{article_id} odba_id #{odba_id} #{quota.class} in #{self}" unless quota.is_a?(BBMB::Model::Quota) ; quota.is_a?(BBMB::Model::Quota) && quota.article_number == article_id }
+        quota_copy = @quotas.clone
+        @quotas.each do |quota|
+          next if quota.is_a?(BBMB::Model::Quota)
+          puts "Customer.quota: called delete_persistable for #{quota.odba_id}"
+          ODBA.storage.delete_persistable(quota.odba_id)
+          ODBA.cache.invalidate(quota.odba_id)
+          quota_copy.delete_if{ |x| x.odba_id == quota.odba_id }
+        end
+        @quotas = quota_copy.compact
+        @quotas.find { |quota| puts "Unexpected class for article_id #{article_id} odba_id #{odba_id} #{quota.class} in #{self}" unless quota.is_a?(BBMB::Model::Quota) ; quota.is_a?(BBMB::Model::Quota) && quota.article_number == article_id }
       end
     end
- end
-end
+  end
+end unless defined?(MiniTest)
 
 module BBMB
   module Util
@@ -58,6 +67,7 @@ module BBMB
           end
         end
         postprocess(persistence)
+        # FileUtils.rm_f(io_path, :verbose => true) if File.exist?(io_path)
         puts  "#{File.basename(__FILE__)}: finished. #{io_path}. count is #{count}"
         count
       end
@@ -66,6 +76,7 @@ module BBMB
       rescue
       end
       def postprocess(persistence)
+        puts "CsvImporter postprocess"
       end
       def string(str)
         str.encode('UTF-8', {invalid: :replace, undef: :replace, replace: ''}) if str
@@ -97,33 +108,52 @@ module BBMB
         return unless(/^\d+$/.match(customer_id))
         active = string(record[1]) == 'A'
         customer   = Model::Customer.find_by_customer_id(customer_id)
-        customer ||= Model::Customer.odba_extent.find_all{|x| /#{record[7]}/.match(x.email) && x.status.eql?(:active)}.first if active && defined?(Model::Customer.odba_extent)
-        if(customer.nil? && active)
+        if customer.nil? && defined?(Model::Customer.odba_extent)
+          if customer2 = Model::Customer.odba_extent.find_all { |x| (x.customer_id.to_i == customer_id.to_i || /#{record[7].gsub('*','')}/.match(x.email)) }.first
+            customer2.odba_delete
+            ODBA.storage.delete_persistable(customer2.odba_id)
+            ODBA.cache.invalidate(customer2.odba_id)
+            puts "CustomerImporter: 1: called delete_persistable for #{customer2.odba_id}. Now find_by_customer_id returns #{Model::Customer.find_by_customer_id(customer_id).inspect}"
+          end
+        end
+        if customer && !customer.is_a?(Model::Customer)
+          ODBA.storage.delete_persistable(customer.odba_id)
+          ODBA.cache.invalidate(customer.odba_id)
+          puts "CustomerImporter: 2: called delete_persistable for #{customer.odba_id}. Now find_by_customer_id returns #{Model::Customer.find_by_customer_id(customer_id).inspect}"
+          customer = nil
+        end
+        if (customer.nil? && active)
           customer = Model::Customer.new(customer_id)
+          puts "Created new customer_id #{customer_id} which is a #{customer.class} with odba_id #{customer.odba_id}"
         end
         if(customer)
-          unless customer.is_a?(Model::Customer)
-            puts "Unable to fix customer_id #{customer_id} which is a #{customer.class} with odba_id #{customer.odba_id}"
-            puts "  values: #{record}"
-            return
-          end
+          has_changes = false
           CUSTOMER_MAP.each do |idx, name|
             unless customer.protects? name
               value = string(record[idx])
               case name
               when :status
+                saved_status = customer.status
                 customer.status = value == 'A' ? :active : :inactive
+                has_changes = true unless customer.status.eql?(saved_status)
               when :language
+                saved_language = customer.language
                 customer.language = LANGUAGES.fetch(value, 'de')
+                has_changes = true unless customer.language.eql?(saved_language)
               else
+                orig_value = eval("customer.#{name}")
                 begin
+                  puts "send #{name}= #{value}. Was #{customer.email}" if name.eql?(:email) && $VERBOSE
                   customer.send("#{name}=", value)
                 rescue => error
                   puts "#{error}: Unable to change #{name} from '#{customer.send("#{name}")}' to '#{value}' for #{record}."
                 end
+                value = eval("customer.#{name}")
+                has_changes = true unless value.to_s.eql?(orig_value.to_s)
               end
             end
           end
+          customer.odba_store if has_changes
         end
         customer
       rescue => err
@@ -131,11 +161,13 @@ module BBMB
           @duplicates.push(err)
         else
           puts err.backtrace.join("\n")
+          # require 'pry'; binding.pry
           raise(err.to_s)
         end
         nil
       end
       def postprocess(persistence)
+        puts "CustomerImporter postprocess"
         super
         unless(@duplicates.empty?)
           err = @duplicates.shift
@@ -201,10 +233,11 @@ module BBMB
         @active_products.store article_number, true
         product = Model::Product.find_by_article_number(article_number) \
           || Model::Product.new(article_number)
-        unless product.is_a?(Model::Product)
-          puts "Could not find a product #{article_number}, it is a #{product.class} with odba_id #{product.odba_id}. Skipping"
-          puts "   #{record}"
-          return nil
+        if product && !product.is_a?(Model::Product)
+          ODBA.storage.delete_persistable(product.odba_id)
+          ODBA.cache.invalidate(product.odba_id)
+          puts "ProductImporter: called delete_persistable for #{product.odba_id}. Now find_by_article_number returns #{Model::Product.find_by_article_number(article_number).inspect}"
+          product = Model::Product.new(article_number)
         end
         PRODUCT_MAP.each do |idx, name|
           value = string(record[idx])
@@ -228,6 +261,7 @@ module BBMB
         end
         product.promotion = import_promotion(product.promotion, record, 19, 33)
         product.sale = import_promotion(product.sale, record, 25, 49)
+        product.odba_store
         product
       end
       def import_promotion(previous, record, offset, offset2)
@@ -256,6 +290,7 @@ module BBMB
         end
       end
       def postprocess(persistence)
+        puts "ProductImporter postprocess"
         return if(@active_products.empty?)
         deletables = []
         persistence.all(BBMB::Model::Product) { |product|
@@ -301,35 +336,52 @@ module BBMB
         return unless(/^\d+$/.match(customer_id))
         art_id = string(record[3])
         if (art_id  \
-           && (custmr = Model::Customer.find_by_customer_id(customer_id)) \
+           && (customer = Model::Customer.find_by_customer_id(customer_id)) \
            && (product = Model::Product.find_by_article_number(art_id)))
-          return unless custmr && product
-          unless custmr.is_a?(Model::Customer)
-            puts "Could not find a customer_id #{customer_id}, it is a #{custmr.class} with odba_id #{custmr.odba_id}. Skipping"
-            puts "   #{record}"
-            return []
+          return unless customer && product
+          if customer && !customer.is_a?(Model::Customer)
+            ODBA.storage.delete_persistable(customer.odba_id)
+            ODBA.cache.invalidate(customer.odba_id)
+            puts "QuotaImporter: called delete_persistable for #{customer.odba_id}. Now find_by_article_number returns #{Model::Customer.find_by_customer_id(customer_id).inspect}"
+            customer = Model::Customer.new(customer_id)
+          end
+          if product && !product.is_a?(Model::Product)
+            ODBA.storage.delete_persistable(product.odba_id)
+            ODBA.cache.invalidate(product.odba_id)
+            puts "QuotaImporter: called delete_persistable for #{product.odba_id}. Now find_by_article_number returns #{Model::Product.find_by_article_number(article_number).inspect}"
+            product = Model::Product.new(article_number)
           end
           puts "Importing Quota for art_id #{art_id}" if $VERBOSE
-          quota = custmr.quota(art_id)
+          quota = customer.quota(art_id)
           if(quota.nil?)
-            quota = custmr.add_quota(Model::Quota.new(product))
+            quota = customer.add_quota(Model::Quota.new(product))
           end
+          has_changes = false
           QUOTA_MAP.each { |idx, name|
             value = string(record[idx])
+            orig_value = eval("quota.#{name}")
             case name
             when :start_date, :end_date
               value = date(value)
             end
             quota.send("#{name}=", value)
+            value = eval("quota.#{name}")
+            has_changes = true unless value.to_s.eql?(orig_value.to_s)
           }
           (@active_quotas[customer_id] ||= []).push(quota)
-          [quota, custmr.quotas]
+          if has_changes
+            @active_quotas[customer_id].odba_store if has_changes
+            quota.odba_store
+          end
+
+          [quota, customer.quotas]
         end
       end
       def postprocess(persistence)
+        puts "QuotaImporter postprocess"
         persistence.all(Model::Customer).each { |customer|
           active = @active_quotas[customer.customer_id] || []
-          persistence.delete *(customer.quotas.compact - active)
+          persistence.delete *(customer.quotas.compact - active).compact
         }
       end
     end
