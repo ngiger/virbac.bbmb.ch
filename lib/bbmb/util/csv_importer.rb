@@ -38,22 +38,29 @@ module BBMB
       @@success = true
       def initialize
         @skip = 1
+        at_exit do
+          if @@success
+            FileUtils.rm_f(@io_path, :verbose => true) if File.exist?(@io_path)
+          else
+            puts "Skipping rm #{@io_path} as succes is #{@@success}"
+          end
+        end
       end
       def import(io, persistence=BBMB.persistence)
         count = 0
         if io.is_a?(StringIO)
           puts  "#{File.basename(__FILE__)}:  importing string"
-          io_path = 'String'
+          @io_path = 'String'
           csv = CSV.new(io)
         else
-          io_path = io.to_path
-          encoding = File.read(io_path).encoding
+          @io_path = io.to_path
+          encoding = File.read(@io_path).encoding
           if encoding.to_s.eql?('UTF-8')
-            csv = CSV.new(File.read(io_path))
+            csv = CSV.new(File.read(@io_path))
           else
-            csv = CSV.new(File.read(io_path, :encoding => encoding).encode('UTF-8'))
+            csv = CSV.new(File.read(@io_path, :encoding => encoding).encode('UTF-8'))
           end
-          puts  "#{File.basename(__FILE__)}: #{encoding} importing #{io_path} #{csv.count} lines"
+          puts  "#{File.basename(__FILE__)}: #{encoding} importing #{@io_path} #{csv.count} lines"
         end
         csv.rewind
         csv.each_with_index do |record, idx|
@@ -68,11 +75,11 @@ module BBMB
           end
         end
         postprocess(persistence)
-        at_exit do
-          FileUtils.rm_f(io_path, :verbose => true) if @@success && File.exist?(io_path)
-        end
-        puts  "#{File.basename(__FILE__)}: finished. #{io_path}. count is #{count}"
+        puts  "#{File.basename(__FILE__)}: finished. #{@io_path}. count is #{count}"
         count
+      rescue => error
+        puts "Rescue #{error} in import"
+        @@success = false
       end
       def date(str)
         Date.parse(str.tr('.', '-'))
