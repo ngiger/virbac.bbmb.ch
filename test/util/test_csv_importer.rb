@@ -12,7 +12,29 @@ require 'bbmb/util/csv_importer'
 require 'stub/persistence'
 require 'stringio'
 
+class Array
+  def odba_store
+    puts "Ignoring Array odba_store"
+  end
+end
 module BBMB
+  module Model
+    class Quota
+      def odba_store
+        # puts "Ignoring Quota odba_store"
+      end
+    end
+    class Customer
+      def odba_store
+        # puts "Ignoring Customer odba_store"
+      end
+    end
+    class Product
+      def odba_store
+        # puts "Ignoring Product odba_store"
+      end
+    end
+  end
   VAT_RATE = 8.0
 
   module Util
@@ -67,7 +89,7 @@ module BBMB
           assert_equal("19, Bxxxx-Axxx", customer.address2)
           assert_equal("2000", customer.plz)
           assert_equal("Nxxxxxxxx", customer.city)
-          assert_equal("xxxxxxxxxx@xxxxxxxx.xx", customer.email)
+          assert_nil(customer.email)
         }
         importer.import(line, persistence)
       end
@@ -90,7 +112,7 @@ module BBMB
           assert_equal("corrected line", customer.address2)
           assert_equal("2000", customer.plz)
           assert_equal("Nxxxxxxxx", customer.city)
-          assert_equal("xxxxxxxxxx@xxxxxxxx.xx", customer.email)
+          assert_nil(customer.email)
         }
         importer.import(line, persistence)
       end

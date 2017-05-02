@@ -132,6 +132,8 @@ module BBMB
             unless customer.protects? name
               value = string(record[idx])
               case name
+              when :email
+                  # puts "ignoring #{name} from '#{customer.send("#{name}")}' with '#{value}'"
               when :status
                 saved_status = customer.status
                 customer.status = value == 'A' ? :active : :inactive
