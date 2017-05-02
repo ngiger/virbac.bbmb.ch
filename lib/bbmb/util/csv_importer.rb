@@ -35,6 +35,7 @@ module BBMB
   module Util
     class CsvImporter
       include DRb::DRbUndumped
+      @@success = true
       def initialize
         @skip = 1
       end
@@ -67,13 +68,17 @@ module BBMB
           end
         end
         postprocess(persistence)
-        # FileUtils.rm_f(io_path, :verbose => true) if File.exist?(io_path)
+        at_exit do
+          FileUtils.rm_f(io_path, :verbose => true) if @@success && File.exist?(io_path)
+        end
         puts  "#{File.basename(__FILE__)}: finished. #{io_path}. count is #{count}"
         count
       end
       def date(str)
         Date.parse(str.tr('.', '-'))
-      rescue
+      rescue => error
+        puts "Rescue #{error} in import"
+        @@success = false
       end
       def postprocess(persistence)
         puts "CsvImporter postprocess"
@@ -164,6 +169,7 @@ module BBMB
         else
           puts err.backtrace.join("\n")
           # require 'pry'; binding.pry
+          @@success = false
           raise(err.to_s)
         end
         nil
