@@ -115,6 +115,10 @@ module BBMB
       end
       def import_record(record)
         customer_id = string(record[0])
+        if customer_id.to_id == 3219
+          puts "Skipping customer 3219" # Skipping bachmann
+          return
+        end
         return unless(/^\d+$/.match(customer_id))
         active = string(record[1]) == 'A'
         customer   = Model::Customer.find_by_customer_id(customer_id)
