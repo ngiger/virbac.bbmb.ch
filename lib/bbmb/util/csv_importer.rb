@@ -84,8 +84,6 @@ module BBMB
       def date(str)
         Date.parse(str.tr('.', '-'))
       rescue => error
-        puts "Rescue #{error} in import"
-        @@success = false
       end
       def postprocess(persistence)
         puts "CsvImporter postprocess"
@@ -175,7 +173,6 @@ module BBMB
           @duplicates.push(err)
         else
           puts err.backtrace.join("\n")
-          # require 'pry'; binding.pry
           @@success = false
           raise(err.to_s)
         end
