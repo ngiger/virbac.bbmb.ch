@@ -115,7 +115,7 @@ module BBMB
       end
       def import_record(record)
         customer_id = string(record[0])
-        if customer_id.to_id == 3219
+        if customer_id.to_i == 3219
           puts "Skipping customer 3219" # Skipping bachmann
           return
         end
