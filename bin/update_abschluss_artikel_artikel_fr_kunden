@@ -38,9 +38,12 @@ module BBMB
   begin
     @server = BBMB::Util::Server.new(@persistence)
     @server.extend(DRbUndumped)
+    $stdout.sync = true
+    start_seconds = Time.now.to_i
     puts "#{Time.now}: Calling update"
     @server.update
-    puts "#{Time.now}: Finished update"
+    seconds = Time.now.to_i-start_seconds
+    puts "#{Time.now}: Finished update after #{(seconds/60).to_i} minutes and #{(seconds % 60).to_i} seconds"
   rescue Exception => error
     @logger.error('fatal') { error }
     raise
