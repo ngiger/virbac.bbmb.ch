@@ -11,9 +11,15 @@ require 'bbmb/util/server'
 require 'mail'
 
 module BBMB
-  @config.load_files.each { |local|
+  def self.check_workdir(msg)
+    work_dir = File.expand_path(File.dirname(File.dirname(__FILE__)))
+    puts "#{Time.now} #{msg}: workdir is #{work_dir} bbmb_dir is #{BBMB.config.bbmb_dir} Dir. pwd is #{Dir.pwd}"
+    Dir.chdir(work_dir) unless Dir.pwd.eql?(work_dir)
+    BBMB.config.bbmb_dir = work_dir
+  end
+  @config.load_files.each do |local|
     require local
-  }
+  end
   require File.join('bbmb', 'persistence', @config.persistence)
   case @config.persistence
   when 'odba'
@@ -22,13 +28,12 @@ module BBMB
   end
 
   log_file = '/tmp/' + File.basename(__FILE__)+ '.log'
-  puts log_file
+  BBMB.check_workdir("log_file is #{log_file}")
   FileUtils.mkdir_p(File.dirname(log_file))
   log_file = File.open(log_file, 'a')
   log_file.sync= true
   at_exit { log_file.close }
   @logger = Logger.new(log_file)
-  puts "#{@logger.inspect}"
   @logger.level = Logger.const_get(@config.log_level)
   @logger.debug('config') { @config.pretty_inspect }
   auth_domain = BBMB.config.auth_domain
@@ -40,12 +45,15 @@ module BBMB
     @server.extend(DRbUndumped)
     $stdout.sync = true
     start_seconds = Time.now.to_i
-    puts "#{Time.now}: Calling update"
+    BBMB.check_workdir('Before update')
     @server.update
     seconds = Time.now.to_i-start_seconds
     puts "#{Time.now}: Finished update after #{(seconds/60).to_i} minutes and #{(seconds % 60).to_i} seconds"
   rescue Exception => error
     @logger.error('fatal') { error }
     raise
+  end
+  at_exit do
+    BBMB.check_workdir('at_exit time')
   end
 end
