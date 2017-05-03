@@ -20,16 +20,25 @@ end
 module BBMB
   module Model
     class Quota
+      def self.odba_extent
+        return []
+      end
       def odba_store
         # puts "Ignoring Quota odba_store"
       end
     end
     class Customer
+      def self.odba_extent
+        return []
+      end
       def odba_store
         # puts "Ignoring Customer odba_store"
       end
     end
     class Product
+      def self.odba_extent
+        return []
+      end
       def odba_store
         # puts "Ignoring Product odba_store"
       end
@@ -54,7 +63,7 @@ module BBMB
       def test_import
         src = StringIO.new <<-EOS
 "Kunden-Nr.","Status","Name1","Name2","PLZ","Ort","Strasse","E-Mail","Sprache","Kanton"
-3000,"A","Axxxxxxx Wxxxxxxx","Vxxxxxxxxxx","2000","Nxxxxxxxx","19, Bxxxx-Axxx","xxxxxxxxxx@xxxxxxxx.xx","x ","NE",
+3000,"A","Aorganisation","Vaddress1","2000","Nxxxxxxxx","19, Baddress2","xxxxxxxxxx@xxxxxxxx.xx","Ncity ","NE",
 3002,"A","Cxxxxx Fxxxxxxxx","Vxxxxxxxxxx","1305","Pxxxxxxxx","10, xx. xx Sxxxxx","xxx.xxxxxx@xxxxxxx.xx","x ","VD",
 3004,"A","Txxxxxxxxxxxxx Rxxxxxxxx AG","","3254","Mxxxxx","Rxxxxxxxx 14","xxxxxxxxxx@xxxxxx.xx","x ","SO",
 3005,"A","Axxxx Pxxxx","Kxxxx- & Zxxxxxxxxxxxx","8507","Hxxxxxxxx","Sxxxxxxxxxxx","xxxxx.xxx@xxxxxxx.xx","x ","TG",
@@ -71,6 +80,16 @@ module BBMB
         }
         CustomerImporter.new.import(src, persistence)
       end
+      def test_import_record_bachmann
+        line = StringIO.new <<-EOS
+"Kunden-Nr.","Status","Name1","Name2","PLZ","Ort","Strasse","E-Mail","Sprache","Kanton"
+3219,"A","Bachmann","","8952","Schlieren","Urdorferstrasse 68","max-bachmann@gmx.ch","D ","ZH2",
+        EOS
+        importer = CustomerImporter.new
+        persistence = flexmock("persistence")
+        persistence.should_receive(:save).never
+        importer.import(line, persistence)
+      end
       def test_import_record
         line = StringIO.new <<-EOS
 "Kunden-Nr.","Status","Name1","Name2","PLZ","Ort","Strasse","E-Mail","Sprache","Kanton"
@@ -78,8 +97,7 @@ module BBMB
         EOS
         importer = CustomerImporter.new
         persistence = flexmock("persistence")
-        persistence.should_receive(:save).times(1)\
-          .and_return { |customer|
+        persistence.should_receive(:save).times(1).and_return do |customer|
           assert_instance_of(Model::Customer, customer)
           assert_equal(:active, customer.status)
           assert_equal("de", customer.language)
@@ -90,7 +108,7 @@ module BBMB
           assert_equal("2000", customer.plz)
           assert_equal("Nxxxxxxxx", customer.city)
           assert_nil(customer.email)
-        }
+        end
         importer.import(line, persistence)
       end
       def test_import_record__protected

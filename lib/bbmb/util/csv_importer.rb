@@ -11,25 +11,6 @@ require 'bbmb/util/mail'
 require 'date'
 require 'csv'
 require 'drb'
-module BBMB
-  module Model
-    class Customer
-      puts "TODO: Remove monkey patching bbmb because of missing customer 3219 as of 2017.04.25"
-      def quota(article_id)
-        quota_copy = @quotas.clone
-        @quotas.each do |quota|
-          next if quota.is_a?(BBMB::Model::Quota)
-          puts "Customer.quota: called delete_persistable for #{quota.odba_id}"
-          ODBA.storage.delete_persistable(quota.odba_id)
-          ODBA.cache.invalidate(quota.odba_id)
-          quota_copy.delete_if{ |x| x.odba_id == quota.odba_id }
-        end
-        @quotas = quota_copy.compact
-        @quotas.find { |quota| puts "Unexpected class for article_id #{article_id} odba_id #{odba_id} #{quota.class} in #{self}" unless quota.is_a?(BBMB::Model::Quota) ; quota.is_a?(BBMB::Model::Quota) && quota.article_number == article_id }
-      end
-    end
-  end
-end unless defined?(MiniTest)
 
 module BBMB
   module Util
@@ -38,13 +19,6 @@ module BBMB
       @@success = true
       def initialize
         @skip = 1
-        at_exit do
-          if @@success
-            FileUtils.rm_f(@io_path, :verbose => true) if File.exist?(@io_path)
-          else
-            puts "Skipping rm #{@io_path} as succes is #{@@success}"
-          end
-        end
       end
       def import(io, persistence=BBMB.persistence)
         count = 0
@@ -76,6 +50,13 @@ module BBMB
         end
         postprocess(persistence)
         puts  "#{File.basename(__FILE__)}: finished. #{@io_path}. count is #{count}"
+        at_exit do
+          if @@success
+            FileUtils.rm_f(@io_path, :verbose => true) if File.exist?(@io_path)
+          else
+            puts "Skipping rm #{@io_path} as succes is #{@@success}"
+          end
+        end
         count
       rescue => error
         puts "Rescue #{error} in import"
@@ -122,21 +103,8 @@ module BBMB
         return unless(/^\d+$/.match(customer_id))
         active = string(record[1]) == 'A'
         customer   = Model::Customer.find_by_customer_id(customer_id)
-        if customer.nil? && defined?(Model::Customer.odba_extent)
-          if customer2 = Model::Customer.odba_extent.find_all { |x| (x.customer_id.to_i == customer_id.to_i || /#{record[7].gsub('*','')}/.match(x.email)) }.first
-            customer2.odba_delete
-            ODBA.storage.delete_persistable(customer2.odba_id)
-            ODBA.cache.invalidate(customer2.odba_id)
-            puts "CustomerImporter: 1: called delete_persistable for #{customer2.odba_id}. Now find_by_customer_id returns #{Model::Customer.find_by_customer_id(customer_id).inspect}"
-          end
-        end
-        if customer && !customer.is_a?(Model::Customer)
-          ODBA.storage.delete_persistable(customer.odba_id)
-          ODBA.cache.invalidate(customer.odba_id)
-          puts "CustomerImporter: 2: called delete_persistable for #{customer.odba_id}. Now find_by_customer_id returns #{Model::Customer.find_by_customer_id(customer_id).inspect}"
-          customer = nil
-        end
-        if (customer.nil? && active)
+        customer ||= Model::Customer.odba_extent.find_all{|x| /#{record[7]}/.match(x.email) && x.status.eql?(:active)}.first if active
+        if(customer.nil? && active)
           customer = Model::Customer.new(customer_id)
           puts "Created new customer_id #{customer_id} which is a #{customer.class} with odba_id #{customer.odba_id}"
         end
