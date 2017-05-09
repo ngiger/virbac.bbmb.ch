@@ -65,15 +65,15 @@ describe "virbac.bbmb" do
     end
     it "fail unknown user" do
       # @auth.should_receive(:login).and_return { raise Yus::UnknownEntityError }
-      @browser.text_field(:name, 'email').when_present.set('unknown@bbmb.ch')
-      @browser.text_field(:name, 'pass').when_present.set('secret')
+      @browser.text_field(:name, 'email').wait_until(&:present?).set('unknown@bbmb.ch')
+      @browser.text_field(:name, 'pass').wait_until(&:present?).set('secret')
       @browser.form(:name, 'login').submit
       expect(@browser.title).to eq 'BBMB'
       expect(@browser.label(:text, 'E-Mail Adresse').attribute_value('class')).to eq 'error'
     end
     it "fail wrong password" do
-      @browser.text_field(:name, 'email').when_present.set(AdminUser)
-      @browser.text_field(:name, 'pass').when_present.set('secret')
+      @browser.text_field(:name, 'email').wait_until(&:present?).set(AdminUser)
+      @browser.text_field(:name, 'pass').wait_until(&:present?).set('secret')
       @browser.form(:name, 'login').submit
       expect(@browser.title).to eq 'BBMB'
       expect(@browser.label(:text, 'Passwort').attribute_value('class')).to eq 'error'
@@ -95,6 +95,17 @@ describe "virbac.bbmb" do
       @browser.goto("#{VirbacUrl}/de/customers")
       validate_german_home
     end
+  end
+end
+
+describe 'mocked virbac' do
+  it "should logout after a timeout" do
+    require 'server_mock'
+    drb_url = "druby://localhost:10081"
+    my_stub = BBMB::Stub.http_server(drb_url, log_level=0)
+    @browser = Watir::Browser.new :chrome
+    @browser.goto('http://localhost:4444')
+    binding.pry
   end
 end
 if false
@@ -199,8 +210,8 @@ Bestellungen, die bei uns bis 14.00 Uhr eingehen, treffen
 grundsätzlich am nächsten Arbeitstag beim Kunden ein.
 
 Impfstoff-Bestellungen am späten Donnerstagnachmittag oder am Freitag
-werden wie folgt ausgeliefert: Am darauffolgenden Montag (wenn keine Dringlichkeit vermerkt ist) 
- Auf Wunsch am Freitag per Mondexpress, dieser wird am Samstagmorgen bis 
+werden wie folgt ausgeliefert: Am darauffolgenden Montag (wenn keine Dringlichkeit vermerkt ist)
+ Auf Wunsch am Freitag per Mondexpress, dieser wird am Samstagmorgen bis
 9 Uhr ausgeliefert (Kosten gehen zu Lasten des Kunden)
     EOS
     click "//div[@class='login-foot']"

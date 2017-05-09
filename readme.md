@@ -23,6 +23,14 @@
 
 ## Testing
 
+niklaus@oddb-ci2 /v/w/virbac.bbmb.ch> bin/admin
+ch.bbmb> BBMB.config.auth_domain
+-> ch.bbmb.vetoquinol
+ch.bbmb> exit
+-> Goodbye
+niklaus@oddb-ci2 /v/w/virbac.bbmb.ch> bin/admin config=/var/www/virbac.bbmb.ch/etc/config.yml
+ch.bbmb.virbac> BBMB.config.auth_domain
+-> ch.bbmb.virbac
 
 ## DEVELOPERS:
 

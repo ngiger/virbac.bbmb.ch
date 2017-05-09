@@ -8,6 +8,7 @@ require 'logger'
 require 'ydim/invoice'
 require 'bbmb/config'
 require 'bbmb/util/server'
+require 'bbmb/util/csv_importer'
 require 'mail'
 
 module BBMB
@@ -17,8 +18,13 @@ module BBMB
     Dir.chdir(work_dir) unless Dir.pwd.eql?(work_dir)
     BBMB.config.bbmb_dir = work_dir
   end
-  @config.load_files.each do |local|
-    require local
+  [ File.join(Dir.pwd, 'etc', 'config.yml'),
+  ].each do |config_file|
+    if File.exist?(config_file)
+      puts "BBMB.config.load from #{config_file}"
+      BBMB.config.load (config_file)
+      break
+    end
   end
   require File.join('bbmb', 'persistence', @config.persistence)
   case @config.persistence
@@ -34,14 +40,15 @@ module BBMB
   log_file.sync= true
   at_exit { log_file.close }
   @logger = Logger.new(log_file)
-  @logger.level = Logger.const_get(@config.log_level)
+  @logger.level = Logger::DEBUG
   @logger.debug('config') { @config.pretty_inspect }
   auth_domain = BBMB.config.auth_domain
   @auth = DRb::DRbObject.new(nil, @config.auth_url)
   bbmb = DRbObject.new(nil, BBMB.config.server_url)
 
   begin
-    @server = BBMB::Util::Server.new(@persistence)
+    # @server = BBMB::Util::Server.new(@persistence)
+    @server = BBMB::Util::RackInterface.new
     @server.extend(DRbUndumped)
     $stdout.sync = true
     start_seconds = Time.now.to_i

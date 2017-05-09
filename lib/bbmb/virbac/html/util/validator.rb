@@ -3,10 +3,10 @@
 
 require 'bbmb/html/util/validator'
 
-module BBMB
+module VIRBAC
   module Html
     module Util
-class Validator
+class Validator < BBMB::Html::Util::Validator
   BOOLEAN.push(:show_vat)
   EVENTS.push(:calculate, :calculator, :catalogue, :promotions, :quotas)
   NUMERIC.push(:factor)

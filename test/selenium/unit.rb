@@ -39,8 +39,7 @@ end
 
 BBMB.config.http_server = 'http://localhost'
 
-$selenium = BBMB::Selenium::SeleniumWrapper.new("localhost", 4444, 
-  "*chrome", BBMB.config.http_server + ":10080", 10000)
+$selenium = BBMB::Selenium::SeleniumWrapper.new("localhost", 4444, "*chrome", BBMB.config.http_server + ":10080", 10000)
 
 start = Time.now
 begin

@@ -1,16 +1,15 @@
 source 'https://rubygems.org'
 
-gem 'odba'
-gem 'bbmb'
-gem 'spreadsheet'
+# gem 'sbsm', :git => 'https://github.com/ngiger/sbsm.git'
+gem 'sbsm', :path => '/home/niklaus/git/sbsm'
+gem 'bbmb', :path => '/home/niklaus/git/bbmb'
+# gem 'htmlgrid', :path => '/home/niklaus/git/htmlgrid'
+#gem 'bbmb'
+gem 'spreadsheet' # for password importer
 
 group :debugger do
-  if RUBY_VERSION.match(/^1/)
-    gem 'pry-debugger'
-  else
-    gem 'pry-byebug'
-    gem 'pry-doc'
-  end
+  gem 'pry-byebug'
+  gem 'pry-doc'
 end
 
 group :test do

@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # Html::Util::Lookandfeel -- bbmb.ch -- 15.09.2006 -- hwyss@ywesee.com
 
+require 'bbmb/html/util/session'
 require 'sbsm/lookandfeel'
 
 module BBMB
@@ -71,7 +72,7 @@ grundsätzlich am nächsten Arbeitstag beim Kunden ein.
 
 Impfstoff-Bestellungen am späten Donnerstagnachmittag oder am Freitag
 werden wie folgt ausgeliefert:<ul><li> Am darauffolgenden Montag (wenn keine Dringlichkeit vermerkt ist) </li>
-<li> Auf Wunsch am Freitag per Mondexpress, dieser wird am Samstagmorgen bis 
+<li> Auf Wunsch am Freitag per Mondexpress, dieser wird am Samstagmorgen bis
 9 Uhr ausgeliefert (Kosten gehen zu Lasten des Kunden) </li></ul>
       EOS
       :default_values           =>  "Voreinstellungen",
@@ -213,7 +214,7 @@ Beste Grüsse. Virbac Schweiz AG
       :th_price_levels          =>  'Staffelpreise',
       :th_price_public          =>  "Publikumspreis",
       :th_price_quota           =>  'Abschlusspreis',
-      :th_quantity              =>  'Menge', 
+      :th_quantity              =>  'Menge',
       :th_order_total           =>  "Endpreis",
       :th_organisation          =>  "Kunde",
       :th_plz                   =>  "PLZ",
@@ -294,12 +295,12 @@ exclusivement avec notre accord
       :delivery_conditions_text =>  <<-EOS,
 Avec l’inscription je prends note des conditions générales
 
-Les commandes qui nous parviennent jusqu’à 14.00 heures seront 
+Les commandes qui nous parviennent jusqu’à 14.00 heures seront
 en principe chez le client le jour suivant.
 
-Les commandes de vaccins qui nous parviennent le jeudi, en fin 
+Les commandes de vaccins qui nous parviennent le jeudi, en fin
 d’après-midi, ou le vendredi seront expédiées comme suit:<ul><li> Le lundi suivant s’il n’y a pas d’urgence, </li>
-<li> sur demande le vendredi par express, sera livrée samedi matin 
+<li> sur demande le vendredi par express, sera livrée samedi matin
      jusqu’à 9 h (frais de port en charge du client) </li></ul>
       EOS
       :default_values           =>  "Revenir au début",
@@ -469,7 +470,17 @@ un jour ouvrable. Meilleures salutations. Virbac Suisse SA
   DISABLED = [ :transfer_dat, :barcode_reader ]
   ENABLED = [ :additional_info_first, :free_products, :request_access ]
   def navigation
-    zone_navigation + super
+    # was pre_rack: zone_navigation + super
+    begin
+      default_value = super
+      puts "navigation return zone_navigation #{zone_navigation} + default_value #{default_value}"
+      zone_navigation + default_value
+    rescue => error
+      prefs =  @session.user.get_preference(:navigation)
+      puts "rescue navigation returns #{zone_navigation + (prefs ? prefs : [])}"
+      require 'pry';binding.pry
+      zone_navigation + (prefs ? prefs : [])
+    end
   end
 end
     end

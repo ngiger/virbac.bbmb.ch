@@ -1,11 +1,10 @@
 #!/bin/bash -v
 
 DB_NAME=virbac_bbmb
-
-yyyy=`date -d '1 days ago' +"%Y"`
-mm=`date -d '1 days ago' +"%m"`
-dd=`date -d '1 days ago' +"%d"`
-DB_DUMP=/var/backup/fast/db_dumps/$DB_NAME.$yyyy$mm$dd.sql.gz
+DAYS_AGO=1
+yyyy=`date -d "$DAYS_AGO days ago" +"%Y"`
+mm=`date -d "$DAYS_AGO days ago" +"%m"`
+dd=`date -d "$DAYS_AGO days ago" +"%d"` DB_DUMP=/var/backup/fast/db_dumps/$DB_NAME.$yyyy$mm$dd.sql.gz
 
 
 m=(dummy January February March April May June July August September October November December)

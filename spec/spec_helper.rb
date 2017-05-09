@@ -29,7 +29,7 @@ VirbacUrl           = 'http://virbac.bbmb.ngiger.ch/'
 Flavor    = 'sbsm'
 ImageDest = File.join(Dir.pwd, 'images')
 Browser2test = [ :chrome ]
-require 'watir-webdriver'
+require 'watir'
 DownloadDir = File.expand_path(File.join(File.dirname(__FILE__), '..', 'downloads'))
 GlobAllDownloads  = File.join(DownloadDir, '*')
 LeeresResult      =  /hat ein leeres Resultat/
@@ -68,8 +68,8 @@ def login(user = ViewerUser, password=ViewerPassword, remember_me=false)
   setup_browser
   @browser.goto VirbacUrl
   sleep 0.5
-  @browser.text_field(:name, 'email').when_present.set(user)
-  @browser.text_field(:name, 'pass').when_present.set(password)
+  @browser.text_field(:name, 'email').wait_until(&:present?).set(user)
+  @browser.text_field(:name, 'pass').wait_until(&:present?).set(password)
   @browser.button(:name,"login").click
   sleep 1 unless @browser.link(:name,"logout").exists?
   if  p
@@ -132,4 +132,11 @@ def createScreenshot(browser, added=nil)
   name = "#{name}#{added}.png"
   browser.screenshot.save (name)
   puts "createScreenshot: #{name} done" if $VERBOSE
+end
+
+def show_threads
+  Thread.list.each do |thread|
+    STDERR.puts "Thread-#{thread.object_id.to_s(36)}"
+    STDERR.puts thread.backtrace.join("\n    \\_ ")
+  end
 end

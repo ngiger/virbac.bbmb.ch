@@ -13,7 +13,7 @@ module BBMB
   module Html
     module State
       module Viral
-module Customer 
+module Customer
   def calculator
     products = BBMB.persistence.all(Model::Product).select { |product|
       product.price
