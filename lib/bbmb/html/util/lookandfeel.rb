@@ -470,17 +470,7 @@ un jour ouvrable. Meilleures salutations. Virbac Suisse SA
   DISABLED = [ :transfer_dat, :barcode_reader ]
   ENABLED = [ :additional_info_first, :free_products, :request_access ]
   def navigation
-    # was pre_rack: zone_navigation + super
-    begin
-      default_value = super
-      puts "navigation return zone_navigation #{zone_navigation} + default_value #{default_value}"
-      zone_navigation + default_value
-    rescue => error
-      prefs =  @session.user.get_preference(:navigation)
-      puts "rescue navigation returns #{zone_navigation + (prefs ? prefs : [])}"
-      require 'pry';binding.pry
-      zone_navigation + (prefs ? prefs : [])
-    end
+    zone_navigation + super
   end
 end
     end

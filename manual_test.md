@@ -2,7 +2,7 @@
 
 The following manual test should be run:
 * Run the importer with a call like
-  bundle exec bin/update_abschluss_artikel_artikel_fr_kunden
+  sudo -u bbmb bundle exec bin/update_abschluss_artikel_artikel_fr_kunden
 * Set in etc/config.yml the update_hour to the next hour and verify that the import start
 
 * login as a normal user
@@ -28,3 +28,12 @@ After selecting abmelden the link "Abmelden" should no longer appear.
 *** Change the password
 *** Generate a new password
 ** Clicking on Umsatz should display a list of orders (total should match)
+
+* Test the admin interface
+  sudo -u bbmb bundle exec bin/virbac_admin
+  Verify it with the following commands
+
+  ch.bbmb.virbac> ODBA.cache.extent(BBMB::Model::Order).size
+  -> 10747
+  ch.bbmb.virbac> ODBA.cache.extent(BBMB::Model::Customer).size
+  -> 3324

@@ -1,10 +1,6 @@
 source 'https://rubygems.org'
 
-# gem 'sbsm', :git => 'https://github.com/ngiger/sbsm.git'
-gem 'sbsm', :path => '/home/niklaus/git/sbsm'
-gem 'bbmb', :path => '/home/niklaus/git/bbmb'
-# gem 'htmlgrid', :path => '/home/niklaus/git/htmlgrid'
-#gem 'bbmb'
+gem 'bbmb', '>= 2.1.4'
 gem 'spreadsheet' # for password importer
 
 group :debugger do

@@ -60,6 +60,7 @@ module BBMB
         count
       rescue => error
         puts "Rescue #{error} in import"
+        puts error.backtrace.join("\n")
         @@success = false
       end
       def date(str)
@@ -93,6 +94,7 @@ module BBMB
       def initialize
         super
         @duplicates = []
+        @new_customers = []
       end
       def import_record(record)
         customer_id = string(record[0])
@@ -102,11 +104,14 @@ module BBMB
         end
         return unless(/^\d+$/.match(customer_id))
         active = string(record[1]) == 'A'
-        customer   = Model::Customer.find_by_customer_id(customer_id)
-        customer ||= Model::Customer.odba_extent.find_all{|x| /#{record[7]}/.match(x.email) && x.status.eql?(:active)}.first if active
+        customer   = Model::Customer.find_by_customer_id(customer_id) # e.g. 4325
+        customer_email = record[7]
+        customer ||= Model::Customer.odba_extent.find_all{|x| x.email && x.email.index(customer_email) && x.status.eql?(:active)}.first if active
+
         if(customer.nil? && active)
           customer = Model::Customer.new(customer_id)
-          puts "Created new customer_id #{customer_id} which is a #{customer.class} with odba_id #{customer.odba_id}"
+          @new_customers << customer_id
+          puts "Created new customer_id #{customer_id} email #{customer_email} which is a #{customer.class} with odba_id #{customer.odba_id}"
         end
         if(customer)
           has_changes = false
@@ -152,6 +157,7 @@ module BBMB
       end
       def postprocess(persistence)
         puts "CustomerImporter postprocess"
+        puts " Created #{@new_customers.size} customers with ID #{@new_customers.join(',')}" if @new_customers.size > 0
         super
         unless(@duplicates.empty?)
           err = @duplicates.shift
@@ -247,6 +253,10 @@ module BBMB
         product.sale = import_promotion(product.sale, record, 25, 49)
         product.odba_store
         product
+      rescue => err
+        puts err.backtrace.join("\n")
+        @@success = false
+        raise(err.to_s)
       end
       def import_promotion(previous, record, offset, offset2)
         lines = []
@@ -277,27 +287,27 @@ module BBMB
         puts "ProductImporter postprocess"
         return if(@active_products.empty?)
         deletables = []
-        persistence.all(BBMB::Model::Product) { |product|
+        persistence.all(BBMB::Model::Product) do |product|
           unless(@active_products.include?(product.article_number))
             deletables.push product
           end
-        }
-        persistence.all(BBMB::Model::Customer) { |customer|
+        end
+        persistence.all(BBMB::Model::Customer) do |customer|
           order = customer.current_order
           quotas = customer.quotas
           deleted_quotas = []
-          deletables.each { |product|
-            order.add(0, product)
+          deletables.each do |product|
+            order.add(0, product) if order && defined?(order.add)
             if(quota = customer.quota(product.article_number))
               quotas.delete(quota)
               deleted_quotas.push(quota)
             end
-          }
+          end
           unless(deleted_quotas.empty?)
             persistence.save(quotas)
             persistence.delete(*deleted_quotas)
           end
-        }
+        end
         persistence.delete(*deletables) unless(deletables.empty?)
       end
     end
@@ -360,6 +370,10 @@ module BBMB
 
           [quota, customer.quotas]
         end
+      rescue => err
+        puts err.backtrace.join("\n")
+        @@success = false
+        raise(err.to_s)
       end
       def postprocess(persistence)
         puts "QuotaImporter postprocess"

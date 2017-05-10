@@ -2,13 +2,15 @@
 # Admin -- bbmb -- 09.07.2003 -- hwyss@ywesee.com
 
 require 'drb'
-require 'sbsm/drb'
 require 'bbmb'
+$: << File.expand_path('../lib', File.dirname(__FILE__))
+require 'bbmb/virbac/app'
+
 config_file = File.expand_path(File.join(__FILE__, '..', '..', 'etc', 'config.yml'))
 if File.exist?(config_file)
   puts "Force the use of #{config_file}"
   ARGV.push "config=#{File.expand_path(File.dirname(File.dirname(__FILE__)))}/etc/config.yml"
-end
+end if false
 require 'bbmb/config'
 require 'bbmb/util/invoicer'
 require 'readline'

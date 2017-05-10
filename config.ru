@@ -9,18 +9,9 @@ lib_dir = File.expand_path(File.join(File.dirname(__FILE__), 'lib').untaint)
 $LOAD_PATH << lib_dir
 $stdout.sync = true
 
-require 'bbmb/config'
-[ File.join(Dir.pwd, 'etc', 'config.yml'),
-].each do |config_file|
-  if File.exist?(config_file)
-    puts "BBMB.config.load from #{config_file}"
-    BBMB.config.load (config_file)
-    break
-  end
-end
-
+# require 'syck'
 require 'bbmb/html/util/validator'
-require 'bbmb/util/app'
+require 'bbmb/virbac/app'
 require 'rack'
 require 'rack/static'
 require 'rack/show_exceptions'
@@ -35,7 +26,5 @@ SBSM.info "Starting Rack::Server BBMB::BBMB::Util.new with log_pattern #{BBMB.co
 
 $stdout.sync = true
 
-my_app = BBMB::Util::RackInterface.new(validator: VIRBAC::Html::Util::Validator)
-
-app = Rack::ShowExceptions.new(Rack::Lint.new(my_app))
+app = Rack::ShowExceptions.new(Rack::Lint.new(BBMB::Util::RackInterface.new(app: VIRBAC::App.new, validator: VIRBAC::Html::Util::Validator)))
 run app
