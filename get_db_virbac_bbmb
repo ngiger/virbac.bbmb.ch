@@ -17,11 +17,10 @@ if [ ! -f $DB_DUMP ]; then
 fi
 ls -l $DB_DUMP
 if [ $? -ne 0 ] ; then exit 1; fi
-echo "sudo -u postgres createdb -E UTF8 -T template0 $DB_NAME"
 
-echo "zcat $DB_DUMP | sudo -u postgres psql $DB_NAME"
+# echo "sudo -u postgres createdb -E UTF8 -T template0 $DB_NAME"
+# echo "zcat $DB_DUMP | sudo -u postgres psql $DB_NAME"
 
-exit
 sudo -u postgres dropdb $DB_NAME
 
 sudo -u postgres createdb -E UTF8 -T template0 $DB_NAME
