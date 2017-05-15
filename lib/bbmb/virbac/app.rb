@@ -36,33 +36,20 @@ module VIRBAC
     end
 
     def start_service
-      if true
-        puts "SKip run_updater & invoice xxxx\n"
-        case BBMB.config.persistence
-        when 'odba'
-          DRb.install_id_conv ODBA::DRbIdConv.new
-          @persistence = BBMB::Persistence::ODBA
-        end
-        @auth = DRb::DRbObject.new(nil, BBMB.config.auth_url)
-        puts "installed @auth #{@auth}"
-      else
-        @server = App.get_server
-        if(BBMB.config.update?)
-          @server.run_updater
-        end
-        if(BBMB.config.invoice?)
-          @server.run_invoicer
-        end
+      case BBMB.config.persistence
+      when 'odba'
+        DRb.install_id_conv ODBA::DRbIdConv.new
+        @persistence = BBMB::Persistence::ODBA
       end
-      case @config.persistence
-        when 'odba'
-          DRb.install_id_conv ODBA::DRbIdConv.new
-          @persistence = BBMB::Persistence::ODBA
+      @auth = DRb::DRbObject.new(nil, BBMB.config.auth_url)
+      puts "installed @auth #{@auth}"
+      @server = App.get_server
+      if(BBMB.config.update?)
+        @server.run_updater
       end
-
-      puts "Skipping #{BBMB.config.server_url}"
-      return
-
+      if(BBMB.config.invoice?)
+        @server.run_invoicer
+      end
       url = BBMB.config.server_url
       url.untaint
       DRb.start_service(url, @server)
