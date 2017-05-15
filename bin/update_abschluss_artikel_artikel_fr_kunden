@@ -3,6 +3,7 @@
 $: << File.expand_path('../lib', File.dirname(__FILE__))
 require 'bbmb/virbac/app'
 require 'bbmb/util/csv_importer'
+require 'bbmb/util/server'
 
 module BBMB
   def self.check_workdir(msg)

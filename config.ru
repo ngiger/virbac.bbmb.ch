@@ -36,7 +36,6 @@ SBSM.info "Starting Rack::Server BBMB::BBMB::Util.new with log_pattern #{BBMB.co
 
 $stdout.sync = true
 
-my_app = BBMB::Util::RackInterface.new(validator: VIRBAC::Html::Util::Validator)
-
+my_app = BBMB::Util::RackInterface.new(app: VIRBAC::App.new, validator: VIRBAC::Html::Util::Validator)
 app = Rack::ShowExceptions.new(Rack::Lint.new(my_app))
 run app
