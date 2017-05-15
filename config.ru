@@ -21,7 +21,7 @@ end
 
 # require 'bbmb/html/util/validator'
 require 'bbmb/virbac/html/util/validator.rb'
-require 'bbmb/util/app'
+require 'bbmb/virbac/app'
 require 'rack'
 require 'rack/static'
 require 'rack/show_exceptions'
