@@ -19,7 +19,7 @@ module VIRBAC
     end
   end
 
-  class App < SBSM::App
+  class App < BBMB::Util::App
     attr_accessor :db_manager, :yus_server
     attr_accessor :auth, :config, :persistence, :server
 
@@ -36,13 +36,32 @@ module VIRBAC
     end
 
     def start_service
-      @server = App.get_server
-      if(BBMB.config.update?)
-        @server.run_updater
+      if true
+        puts "SKip run_updater & invoice xxxx\n"
+        case BBMB.config.persistence
+        when 'odba'
+          DRb.install_id_conv ODBA::DRbIdConv.new
+          @persistence = BBMB::Persistence::ODBA
+        end
+        @auth = DRb::DRbObject.new(nil, BBMB.config.auth_url)
+        puts "installed @auth #{@auth}"
+      else
+        @server = App.get_server
+        if(BBMB.config.update?)
+          @server.run_updater
+        end
+        if(BBMB.config.invoice?)
+          @server.run_invoicer
+        end
       end
-      if(BBMB.config.invoice?)
-        @server.run_invoicer
+      case @config.persistence
+        when 'odba'
+          DRb.install_id_conv ODBA::DRbIdConv.new
+          @persistence = BBMB::Persistence::ODBA
       end
+
+      puts "Skipping #{BBMB.config.server_url}"
+      return
 
       url = BBMB.config.server_url
       url.untaint

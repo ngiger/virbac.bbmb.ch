@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
-gem 'bbmb', '>= 2.1.4'
+#gem 'bbmb', '>= 2.1.4'
+gem 'bbmb', :path =>'/home/niklaus/git/bbmb'
 gem 'spreadsheet' # for password importer
 
 group :debugger do
