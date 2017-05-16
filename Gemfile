@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'bbmb', '>= 2.1.4'
+gem 'bbmb', '>= 2.1.5'
 gem 'sbsm', '>= 1.3.8'
 gem 'spreadsheet' # for password importer
 
