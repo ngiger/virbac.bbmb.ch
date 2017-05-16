@@ -12,15 +12,24 @@ The following manual test should be run:
 *** Archiv
 *** Schnellbestellung
 *** Katalog
+**** Test whether you can add an item to a Bestellung
 *** Abschlüsse
 *** Promotionen
+**** Test whether you can add a HPM item to the Schnellbestellung
 *** Kalkulieren
+**** Test whether changing the factor works
 *** Passwort ändern
 *** Abmelden
 After selecting abmelden the link "Abmelden" should no longer appear.
 
 * login as admin user
 ** All customers should appear
+*** For a normal user Claude and user Perk test that
+**** you can find them via the search
+**** you can select then
+**** when clicking on "Umsatz" you see a list of article with prices and total
+**** when clicking on numerical value of Umsatz you see a list of orders.
+**** Click on an order and you must see the items orders with name, list price, effective price, total, MWSt
 ** Search via name/id/address should work
 ** Changing the language to french and back should work
 ** Select a user and
