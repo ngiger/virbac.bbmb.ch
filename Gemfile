@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'bbmb', '>= 2.1.6'
-gem 'sbsm', '>= 1.3.8'
+gem 'sbsm', '>= 1.3.9'
 gem 'spreadsheet' # for password importer
 
 group :debugger do
