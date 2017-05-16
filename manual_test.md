@@ -24,6 +24,7 @@ After selecting abmelden the link "Abmelden" should no longer appear.
 
 * login as admin user
 ** All customers should appear
+*** You must be able to sort each column by clicking on the column header. Clicking a second time must invert the search order
 *** For a normal user Claude and user Perk test that
 **** you can find them via the search
 **** you can select then
