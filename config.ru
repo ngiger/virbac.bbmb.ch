@@ -27,6 +27,7 @@ require 'rack/static'
 require 'rack/show_exceptions'
 require 'rack'
 require 'sbsm/logger'
+require 'bbmb/util/rack_interface'
 require 'webrick'
 SBSM.logger= ChronoLogger.new(BBMB.config.log_pattern)
 use Rack::CommonLogger, SBSM.logger

@@ -21,16 +21,6 @@ module VIRBAC
   end
 
   class App < BBMB::Util::App
-    def login(email, pass)
-      session = BBMB.auth.login(email, pass, BBMB.config.auth_domain)
-      Html::Util::KnownUser.new(session)
-    end
-
-    def logout(session)
-      BBMB.auth.logout(session)
-    rescue DRb::DRbError, RangeError, NameError
-    end
-
     def initialize
       SBSM.logger= ChronoLogger.new(BBMB.config.log_pattern)
       SBSM.logger.level = :debug
