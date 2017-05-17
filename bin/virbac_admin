@@ -4,6 +4,7 @@
 require 'drb'
 require 'bbmb'
 $: << File.expand_path('../lib', File.dirname(__FILE__))
+require 'pry'
 require 'bbmb/virbac/app'
 
 config_file = File.expand_path(File.join(__FILE__, '..', '..', 'etc', 'config.yml'))
@@ -12,7 +13,6 @@ if File.exist?(config_file)
   ARGV.push "config=#{File.expand_path(File.dirname(File.dirname(__FILE__)))}/etc/config.yml"
 end if false
 require 'bbmb/config'
-require 'bbmb/util/invoicer'
 require 'readline'
 include Readline
 
@@ -30,7 +30,7 @@ auth_domain = BBMB.config.auth_domain
 $0 = "#{auth_domain} (Admin-Tool)"
 prompt = "#{auth_domain}> "
 
-DRb.start_service('druby://localhost:0')
+VIRBAC::App.new
 bbmb = DRbObject.new(nil, BBMB.config.server_url)
 last_error = nil
 priority = -1

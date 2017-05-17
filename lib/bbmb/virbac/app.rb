@@ -24,6 +24,9 @@ module VIRBAC
     def initialize
       SBSM.logger= ChronoLogger.new(BBMB.config.log_pattern)
       SBSM.logger.level = :debug
+      msg = "Used version: sbsm #{SBSM::VERSION}, bbmb #{BBMB::VERSION} virbac #{VERSION}"
+      puts msg
+      SBSM.logger.info(msg)
       super
     end
   end
