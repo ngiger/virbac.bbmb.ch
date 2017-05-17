@@ -6,6 +6,7 @@ require 'sbsm/session'
 require 'sbsm/app'
 require 'ydim/invoice'
 require 'bbmb/util/app'
+require 'bbmb/util/csv_importer'
 
 module VIRBAC
   VERSION = `git rev-parse HEAD`
