@@ -21,16 +21,12 @@ module BBMB
   @logger = Logger.new(log_file)
   @logger.level = Logger::DEBUG
   @logger.debug('config') { @config.pretty_inspect }
-  auth_domain = BBMB.config.auth_domain
-  @auth = DRb::DRbObject.new(nil, @config.auth_url)
-  bbmb = DRbObject.new(nil, BBMB.config.server_url)
-
   begin
-    @server = VIRBAC::App.get_server
     $stdout.sync = true
     start_seconds = Time.now.to_i
-    BBMB.check_workdir('Before update')
-    @server.update
+    bbmb = DRbObject.new(nil, BBMB.config.server_url)
+    BBMB.check_workdir("Before bbmb #{bbmb}")
+    bbmb.update
     seconds = Time.now.to_i-start_seconds
     puts "#{Time.now}: Finished update after #{(seconds/60).to_i} minutes and #{(seconds % 60).to_i} seconds"
   rescue Exception => error
