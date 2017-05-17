@@ -37,9 +37,17 @@ After selecting abmelden the link "Abmelden" should no longer appear.
 *** Changing a street address (and other fields should work). Values should persist after restarting the app
 *** Change the password
 *** Generate a new password
+*** Change the e-mail
+**** When the email is not empty, it should not to possible to save an empty password
+**** When setting it to the e-mail of another customer, this change must be refused
 ** Clicking on Umsatz should display a list of orders (total should match)
 
-* Test the admin interface
+* Test the admin interface. But first add the following lines to your etc/config.yml
+  mail_suppress_sending: true
+  order_destinations:
+    - "file:///var/www/virbac.bbmb.ch/dummy_order_destinations"
+
+** Here is a replay of session
   sudo -u bbmb bundle exec bin/virbac_admin
   Verify it with the following commands
 
@@ -47,3 +55,16 @@ After selecting abmelden the link "Abmelden" should no longer appear.
   -> 10747
   ch.bbmb.virbac> ODBA.cache.extent(BBMB::Model::Customer).size
   -> 3324
+  ch.bbmb.virbac>update
+  ch.bbmb.virbac>invoice(Time.now-24*60*60..Time.now)
+  ch.bbmb.virbac> invoice(Time.now-24*60*60..Time.now)
+  -> /home/niklaus/git/bbmb/lib/bbmb/util/mail.rb:61 Suppress sending mail with subject: Bbmb(Virbac): No invoice necessary
+  from orders.virbac@bbmb.ch to: ["ngiger@ywesee.com"] cc: [] reply_to:
+  Baseline:      3000000.00
+  Turnover:            0.00
+  Current Month:       0.00
+  -------------------------
+  Outstanding:   3000000.00
+  Mail::Message
+  ch.bbmb.virbac>exit
+  -> Goodby
