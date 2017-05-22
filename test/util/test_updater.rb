@@ -16,19 +16,17 @@ module BBMB
     class TestUpdater < Minitest::Test
       include FlexMock::TestCase
       def setup
-        BBMB.config = config = flexmock('Config')
-        importers = {
+        load File.join($:.find{|x| /gems\/bbmb/.match(x) }, 'bbmb/config.rb')
+        BBMB.config.importers = {
           'ABSCHLUSS.CSV' => 'QuotaImporter',
           'ARTIKEL.CSV'   => ['ProductImporter', :de],
           'ARTIKEL_FR.CSV'   => ['ProductImporter', :fr],
           'KUNDEN.CSV'    => 'CustomerImporter',
         }
-        config.should_receive(:importers).and_return(importers)
-        if defined?(BBMB.logger)
-          BBMB.logger = flexmock("logger")
-          BBMB.logger.should_receive(:info)
-          BBMB.logger.should_receive(:debug)
-        end
+      end
+      def teardown
+        BBMB.config = nil
+        super
       end
       def test_import_customers
         persistence = flexmock("persistence")

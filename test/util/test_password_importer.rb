@@ -21,7 +21,7 @@ module BBMB
         @row = [ "                                ",
           Time.local(2002, 4, 11, 10, 36), "Mxxxx", @password, "Wxxxxxxxxxx 65",
           nil, nil, nil, "CHE",nil, @email, 999999, nil, nil, 3113,
-          "Rxxxxxx", "Cxxxxx", nil, "0x xxx xx xx",nil, nil, "0x xxx xx xx", 
+          "Rxxxxxx", "Cxxxxx", nil, "0x xxx xx xx",nil, nil, "0x xxx xx xx",
           "Dr. med. vet.", 1, "de", 1, nil, 2,1,4,1,2,6,1,1,3
         ]
         BBMB.auth = flexmock('yus-server')
@@ -32,7 +32,9 @@ module BBMB
         config.should_receive(:auth_domain).and_return('ch.bbmb')
         config.should_ignore_missing
         @importer = PasswordImporter.new('root', 'unguessable')
-        BBMB.logger = flexmock('logger')
+      end
+      def teardown
+        BBMB.config = nil
       end
       def test_import_record__no_password
         @row[3] = nil
