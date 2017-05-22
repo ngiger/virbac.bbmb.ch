@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    bbmb (2.2.2)
+    bbmb (2.2.3)
       deprecated (= 2.0.1)
       hpricot
       htmlgrid
@@ -10,7 +10,7 @@ GEM
       needle
       odba (>= 1.1.2)
       rclconf
-      sbsm (>= 1.4.0)
+      sbsm (>= 1.4.1)
       syck
       ydbd-pg (>= 0.5.2)
       ydbi (>= 0.5.3)
@@ -75,7 +75,7 @@ GEM
     rspec-support (3.6.0)
     ruby-ole (1.2.12.1)
     rubyzip (1.2.1)
-    sbsm (1.4.0)
+    sbsm (1.4.1)
       chrono_logger
       hpricot
       mail
@@ -132,7 +132,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bbmb (>= 2.2.2)
+  bbmb (>= 2.2.3)
   flexmock
   minitest
   pry-byebug
