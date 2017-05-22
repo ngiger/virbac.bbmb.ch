@@ -11,6 +11,8 @@ The following manual test should be run:
 *** Warenkorb (Home)
 *** Archiv
 *** Schnellbestellung
+**** Adding an item via Suchen must work
+**** Deleting an itme must work
 *** Katalog
 **** Test whether you can add an item to a Bestellung
 *** Abschlüsse
@@ -31,6 +33,7 @@ After selecting abmelden the link "Abmelden" should no longer appear.
 **** when clicking on "Umsatz" you see a list of article with prices and total
 **** when clicking on numerical value of Umsatz you see a list of orders.
 **** Click on an order and you must see the items orders with name, list price, effective price, total, MWSt
+*** Submit an order
 ** Search via name/id/address should work
 ** Changing the language to french and back should work
 ** Select a user and
