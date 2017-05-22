@@ -34,6 +34,9 @@ After selecting abmelden the link "Abmelden" should no longer appear.
 **** when clicking on numerical value of Umsatz you see a list of orders.
 **** Click on an order and you must see the items orders with name, list price, effective price, total, MWSt
 *** Submit an order
+**** Check that it landed in directory specified via the order_destinations in etc/config.yml, eg. via
+     order_destinations:
+        - "file:///var/www/virbac.bbmb.ch/order_destinations"
 ** Search via name/id/address should work
 ** Changing the language to french and back should work
 ** Select a user and
