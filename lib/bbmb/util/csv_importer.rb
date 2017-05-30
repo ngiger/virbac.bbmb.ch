@@ -8,6 +8,7 @@ require 'bbmb/model/quota'
 require 'bbmb/model/product'
 require 'bbmb/model/promotion'
 require 'bbmb/util/mail'
+require 'sbsm/logger'
 require 'date'
 require 'csv'
 require 'drb'
@@ -103,6 +104,7 @@ module BBMB
           return
         end
         return unless(/^\d+$/.match(customer_id))
+        has_changes = []
         active = string(record[1]) == 'A'
         customer   = Model::Customer.find_by_customer_id(customer_id) # e.g. 4325
         customer_email = record[7]
@@ -114,9 +116,22 @@ module BBMB
           puts "Created new customer_id #{customer_id} email #{customer_email} which is a #{customer.class} with odba_id #{customer.odba_id}"
         end
         if(customer)
-          has_changes = false
           CUSTOMER_MAP.each do |idx, name|
-            unless customer.protects? name
+            if name.eql?(:email)
+              new_email = string(record[idx])
+              if new_email && new_email.length > 0 && !customer.email.eql?(new_email)
+                has_changes << [idx, name, customer.email, new_email]
+                # Here we should check whether Yus known the new identity.
+                # But as we don't have credentials to login we cannot check it
+                # auth_session = BBMB.auth.login(BBMB.config.admin_name, BBMB.config.admin_passwd, BBMB.config.auth_domain)
+                # entity = auth_session.find_entity(new_email)
+                # if entity && entity.valid?
+                customer.set_email_without_yus(new_email)
+                SBSM.info "Changing email from '#{customer.email}' to '#{new_email}' for customer #{customer_id}"
+              end
+            end
+
+            unless customer.protects?(name)
               value = string(record[idx])
               case name
               when :email
@@ -124,25 +139,25 @@ module BBMB
               when :status
                 saved_status = customer.status
                 customer.status = value == 'A' ? :active : :inactive
-                has_changes = true unless customer.status.eql?(saved_status)
+                has_changes << [idx, name, saved_status, customer.status]  unless customer.status.eql?(saved_status)
               when :language
                 saved_language = customer.language
                 customer.language = LANGUAGES.fetch(value, 'de')
-                has_changes = true unless customer.language.eql?(saved_language)
+                has_changes << [idx, name, saved_language, customer.language ]  unless customer.language.eql?(saved_language)
               else
                 orig_value = eval("customer.#{name}")
                 begin
-                  puts "send #{name}= #{value}. Was #{customer.email}" if name.eql?(:email) && $VERBOSE
+                  SBSM.info "send #{name}= #{value}. Was #{customer.email}" if name.eql?(:email) && $VERBOSE
                   customer.send("#{name}=", value)
                 rescue => error
                   puts "#{error}: Unable to change #{name} from '#{customer.send("#{name}")}' to '#{value}' for #{record}."
                 end
                 value = eval("customer.#{name}")
-                has_changes = true unless value.to_s.eql?(orig_value.to_s)
+                has_changes  << [idx, name, orig_value, value] unless value.to_s.eql?(orig_value.to_s)
               end
             end
           end
-          customer.odba_store if has_changes
+          customer.odba_store if has_changes.size > 0
         end
         customer
       rescue => err
@@ -156,14 +171,14 @@ module BBMB
         nil
       end
       def postprocess(persistence)
-        puts "CustomerImporter postprocess"
-        puts " Created #{@new_customers.size} customers with ID #{@new_customers.join(',')}" if @new_customers.size > 0
+        SBSM.info  "CustomerImporter postprocess"
+        SBSM.info " Created #{@new_customers.size} customers with ID #{@new_customers.join(',')}" if @new_customers.size > 0
         super
         unless(@duplicates.empty?)
           err = @duplicates.shift
           @duplicates.each { |other| err.message << "\n" << other.message }
           Util::Mail.notify_error(err)
-          puts "Util::Mail.notify_err: #{@duplicates.size} @duplicates done"
+          SBSM.info "Util::Mail.notify_err: #{@duplicates.size} @duplicates done"
         end
       end
     end
