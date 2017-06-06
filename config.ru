@@ -9,18 +9,6 @@ lib_dir = File.expand_path(File.join(File.dirname(__FILE__), 'lib').untaint)
 $LOAD_PATH << lib_dir
 $stdout.sync = true
 
-require 'bbmb/config'
-[ File.join(Dir.pwd, 'etc', 'config.yml'),
-].each do |config_file|
-  if File.exist?(config_file)
-    puts "BBMB.config.load from #{config_file}"
-    BBMB.config.load (config_file)
-    break
-  end
-end
-
-# require 'bbmb/html/util/validator'
-require 'bbmb/virbac/html/util/validator.rb'
 require 'bbmb/virbac/app'
 require 'rack'
 require 'rack/static'

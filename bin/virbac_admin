@@ -1,16 +1,13 @@
 #!/usr/bin/env ruby
 # Admin -- bbmb -- 09.07.2003 -- hwyss@ywesee.com
 
-require 'drb'
-require 'bbmb'
 $: << File.expand_path('../lib', File.dirname(__FILE__))
 begin
   require 'pry'
 rescue LoadError
 end
-require 'bbmb/virbac/app'
 
-require 'bbmb/config'
+require 'bbmb/virbac/app'
 require 'readline'
 include Readline
 
@@ -29,7 +26,7 @@ $0 = "#{auth_domain} (Admin-Tool)"
 prompt = "#{auth_domain}> "
 
 VIRBAC::App.new
-puts "Using BBMB.server #{BBMB.server}"
+puts "Using BBMB.server #{BBMB.server} using the database #{BBMB.config.db_name}"
 last_error = nil
 priority = -1
 while(line = readline(prompt, true))
