@@ -31,6 +31,10 @@ module BBMB
       def self.odba_extent
         return []
       end
+      def initialize(customer_id)
+        @customer_id = customer_id
+        @email = "email_#{customer_id}@test.org"
+      end
       def odba_store
         # puts "Ignoring Customer odba_store"
       end
@@ -59,6 +63,12 @@ module BBMB
         Model::Customer.clear_instances
         BBMB.server = flexmock('server')
         BBMB.server.should_ignore_missing
+        @customer = flexmock(::BBMB::Model::Customer.new(706561))
+        BBMB::Util::CustomerImporter::CUSTOMER_MAP.each do |idx, name|
+          @customer.should_receive(:protects?).with(name).and_return(name.eql?(:email))
+        end
+        flexmock(::BBMB::Model::Customer).should_receive(:find_by_customer_id).and_return(@customer)
+
       end
       def test_import
         src = StringIO.new <<-EOS
@@ -76,6 +86,18 @@ module BBMB
         EOS
         persistence = flexmock("persistence")
         persistence.should_receive(:save).times(10).and_return { |customer|
+          assert_instance_of(::BBMB::Model::Customer, customer)
+        }
+        CustomerImporter.new.import(src, persistence)
+      end
+
+      def test_import_no_email
+        src = StringIO.new <<-EOS
+"Kunden-Nr.","Status","Name1","Name2","PLZ","Ort","Strasse","E-Mail","Sprache","Kanton"
+706561,"A","Fehlmann-Vetsch","","9000","St. Gallen","Schillerstrasse 25","","D ","SG",
+        EOS
+        persistence = flexmock("persistence")
+        persistence.should_receive(:save).times(1).and_return { |customer|
           assert_instance_of(Model::Customer, customer)
         }
         CustomerImporter.new.import(src, persistence)
