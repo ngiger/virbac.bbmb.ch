@@ -5,7 +5,6 @@ gem 'spreadsheet' # for password importer
 
 group :debugger do
   gem 'pry-byebug'
-  gem 'pry-doc'
 end
 
 group :test do

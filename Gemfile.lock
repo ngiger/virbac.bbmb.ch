@@ -53,9 +53,6 @@ GEM
     pry-byebug (3.4.2)
       byebug (~> 9.0)
       pry (~> 0.10)
-    pry-doc (0.10.0)
-      pry (~> 0.9)
-      yard (~> 0.9)
     rack (2.0.3)
     rake (12.0.0)
     rclconf (1.0.0)
@@ -97,7 +94,6 @@ GEM
     watir-webdriver (0.9.9)
       selenium-webdriver (>= 2.46.2)
     websocket (1.2.4)
-    yard (0.9.9)
     ydbd-pg (0.5.3)
       pg
       ydbi (>= 0.5.0)
@@ -136,7 +132,6 @@ DEPENDENCIES
   flexmock
   minitest
   pry-byebug
-  pry-doc
   rake
   rspec
   spreadsheet
@@ -145,4 +140,4 @@ DEPENDENCIES
   watir-webdriver
 
 BUNDLED WITH
-   1.15.0
+   1.16.0
